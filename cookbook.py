@@ -5,7 +5,7 @@ def demo_sal_m():
     sal_d_by_m(ftwi=_ftwi,
                m1=1,
                m2=5,
-               dmax=100,
+               dmax=200,
                size=20,
                label='lab',
                wkpl=True,
