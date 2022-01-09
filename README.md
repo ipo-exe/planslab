@@ -45,23 +45,29 @@ from tools import sal_d_by_m
 # define TWI raster file:
 _ftwi = './data/twi.asc'
 
-# define TWI raster file:
+# define basin raster file:
 _fbasin = './data/basin.asc'
 
 # define output folder:
 _outfolder = '/content/output'
 
+# define the first m parameter value:
+_m1 = 1
+
+# define the second m paramete value:
+_m2 = 5
+
 # call tool and parameters:
 sal_d_by_m(ftwi=_ftwi,
            fbasin=_fbasin,
-           m1=1,
-           m2=5,
+           m1=_m1,
+           m2=_m1,
            dmax=50,
            size=30,
            label='lab',
            wkpl=True,
            folder=_outfolder)
 ```
-Thus yielding a nice gif animation:
+Thus yielding a cool gif animation:
 
 ![sal_m](https://github.com/ipo-exe/planslab/blob/main/docs/animation.gif "sal")
