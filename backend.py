@@ -19,3 +19,10 @@ def create_rundir(label='', wkplc='C:'):
     dir_nm = wkplc + '/' + label + '_' + nowsep()
     os.mkdir(dir_nm)
     return dir_nm
+
+
+def status(msg='Status message', process=True):
+    if process:
+        print('\t>>> {:60}...'.format(msg))
+    else:
+        print('\n\t>>> {:60}\n'.format(msg))

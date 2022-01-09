@@ -12,10 +12,11 @@ def sal_deficit_frame(dgbl, d1, vsa1, d2, vsa2, p1, p2,
                       vmin=0,
                       dgbl_max=100,
                       filename='SAL_d_frame_X',
-                      folder='C:/bin', supttl='Sensitivity to the m parameter'):
+                      folder='C:/bin',
+                      supttl='Sensitivity to the m parameter'):
     fig = plt.figure(figsize=(10, 6), )  # Width, Height
     fig.suptitle(supttl)
-    gs = mpl.gridspec.GridSpec(2, 3, wspace=0.3, hspace=0.45)
+    gs = mpl.gridspec.GridSpec(2, 3, wspace=0.3, hspace=0.45, left=0.05, bottom=0.05, top=0.95, right=0.95)
     #
     #
     ax = fig.add_subplot(gs[0, 0])
