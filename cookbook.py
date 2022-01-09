@@ -89,5 +89,4 @@ def demo_sal_twi():
                  folder=_outfolder)
 
 
-demo_sal_m()
-demo_sal_twi()
+demo_sal_lamb()
