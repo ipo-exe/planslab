@@ -1,10 +1,10 @@
 # planslab
 
-`planslab` is a python repository intended to be a laboratory for playing around with the `plans` model concepts, which itself is based in TOPMODEL.
+`planslab` is a python repository intended to be a laboratory for playing around with the `plans` model concepts, which itself is based in `TOPMODEL`.
 
-##local machines
+## local machines
 
-to run `planslab` on a local machine you will need to pre-install:
+To run `planslab` on a local machine you will need to pre-install:
 * `python3` 
 * `numpy`
 * `pandas`
@@ -12,10 +12,10 @@ to run `planslab` on a local machine you will need to pre-install:
 * `scipy`
 * `imageio`
 
-there is plenty of information on the web about how to do it for different operating systems, so go check it out. 
+There is plenty of information on the web about how to do it for different operating systems, so go check it out. 
 
 ## cloud - google colab
-alternatively you may run it in the cloud using google's `colab` platform so you do not need to worry about any of these libraries.
+Alternatively you may run it in the cloud using google's `colab` platform so you do not need to worry about any of these libraries.
 1) create a google account for you;
 2) create a `colab` blank notebook on https://colab.research.google.com/;
 3) clone this repository;
