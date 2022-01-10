@@ -28,7 +28,7 @@ Alternatively you may run it in the cloud using google's `colab` platform so you
 
 Included in the repo there is this `cookbook.py` file. you may check it for some neat examples.
 
-### sensitivity analysis (`SAL`) of the `m` parameter
+### `SAL` (sensitivity analysis) of the `m` parameter
 
 For instance, consider the `TOPMODEL` concepts of the local and global deficits and the `m` exponential decay parameter for baseflow discharge.
 
@@ -73,7 +73,7 @@ Thus yielding a cool gif animation:
 ![sal_m](https://github.com/ipo-exe/planslab/blob/main/docs/animation_m.gif "sal")
 
 
-### sensitivity analysis (`SAL`) of the `lambda` parameter
+### `SAL` (sensitivity analysis) of the `lambda` parameter
 
 In the `TOPMODEL`, `lambda` is defined as the average `TWI` value within the catchment basin. 
 But who cares about the standard definition? In the formula `lambda` really works as a threshold for mapping local deficits. 
@@ -127,7 +127,7 @@ And then we got another cool gif animation:
 ![sal_lamb](https://github.com/ipo-exe/planslab/blob/main/docs/animation_lamb.gif "sal")
 
 
-### sensitivity analysys - `SAL` - of the `TWI`
+### `SAL` (sensitivity analysis) of the `TWI`
 
 `TWI` - the Topographic Wetness Index is among the core ideas behind the `TOPMODEL` approach. 
 It is a similarity index map for the propensity to saturation of a given element in the catchment.
