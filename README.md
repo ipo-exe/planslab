@@ -94,7 +94,7 @@ _ftwi = './data/twi.asc'
 _fbasin = './data/basin.asc'
 
 # define output folder:
-_outfolder = 'C:/bin'
+_outfolder = '/content/output'
 
 # compute the standard lambda
 # load twi map
@@ -126,5 +126,49 @@ And then we got another cool gif animation:
 
 ![sal_lamb](https://github.com/ipo-exe/planslab/blob/main/docs/animation_lamb.gif "sal")
 
+
+### sensitivity analysys - `SAL` - of the `TWI`
+
+`TWI` - the Topographic Wetness Index is among the core ideas behind the `TOPMODEL` approach. 
+It is a similarity index map for the propensity to saturation of a given element in the catchment.
+
+Again, there is the standard TWI formula derived from the assumptions made when `TOPMODEL` was developed.
+And again, we do not care much about the standard formulas. 
+What if the propensity to saturation if different? 
+This type of question opens the doors for many new hypothesis of how this propensity to saturation can be mapped.
+
+And we may perform some more `SAL` on this.
+
+```python
+ # import tool:
+from tools import sal_d_by_twi
+
+# define TWI1 raster file:
+_ftwi1 = './data/twi.asc'
+
+# define TWI2 raster file:
+_ftwi2 = './data/htwi.asc'
+
+# define Basin map file
+_fbasin = './data/basin.asc'
+
+# define output folder:
+_outfolder = '/content/output'
+
+# call tool and set parameters:
+sal_d_by_twi(ftwi1=_ftwi1,
+             ftwi2=_ftwi2,
+             fbasin=_fbasin,
+             m=4,
+             dmax=50,
+             size=30,
+             label='lab',
+             wkpl=True,
+             folder=_outfolder)
+```
+
+More cool gif animation:
+
+![sal_twi](https://github.com/ipo-exe/planslab/blob/main/docs/animation_twi.gif "sal")
 
 
