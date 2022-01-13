@@ -50,10 +50,10 @@ places and in places downstream the catchment. In a map it should look like this
 ![twi](https://github.com/ipo-exe/planslab/blob/main/data/twi.png "twi")
 
 
-There is some physical justification for the `TWI` standard formula, which was derived based on 
-a set of assumptions. We invite you to come with some new hypothesis for a saturation
-propensity index. Here we got a new saturation index, the `HTWI`, which uses the `HAND` and `TWI`
-in a composite formula:
+There is some physical justification for the `TWI` standard formula, which was derived 
+mathmatically after a set of assumptions. We invite you to come with some new 
+hypothesis for a saturation propensity index. Here we got a new saturation index,
+the `HTWI`, which uses the `HAND` and `TWI` in a composite formula:
 
 ![htwi](https://github.com/ipo-exe/planslab/blob/main/data/htwi.png "htwi")
 
