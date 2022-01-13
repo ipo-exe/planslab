@@ -12,10 +12,10 @@ To run `planslab` on a local machine you will need to pre-install:
 * `scipy`
 * `imageio`
 
-There is plenty of information on the web about how to do it for different operating systems, so go check it out. 
+There is a lot of information on the web about how to do it for different operating systems, so go check it out. 
 
 ## cloud - google colab
-Alternatively you may run it in the cloud using google's `colab` platform so you do not need to worry about any of these libraries.
+Alternatively you may run `planslab` in the cloud using google's `colab` platform so you do not need to worry about any of these libraries.
 1) create a google account for you;
 2) create a `colab` blank notebook on https://colab.research.google.com/;
 3) clone this repository;
@@ -23,6 +23,44 @@ Alternatively you may run it in the cloud using google's `colab` platform so you
 5) create a directory for storing the data on the side bar;
 6) upload all data files in the directory you just created;
 7) start writing your scripts.
+
+# basics
+
+## the `TWI` 
+
+`TOPMODEL` (Beven & Kirkby, 1979) is a semi-distributed hydrological model, 
+so is it based on the _hydrological similarity_ concept. 
+It uses topographical information to predict the **propensity to soil saturation** in 
+different
+places within a given catchment. Such _similarity index_ is named `TWI` or 
+_Topographical Wetness Index_ and it may be computed in a map grid as follows:
+
+```markdown
+TWI = ln (flowacc / (n * tan(slope)))
+```
+
+Where:
+* `flowacc` is the accumulated draining area in sq. meters;
+* `n` is the resolution of the grid cell in meters; 
+* `slope` is the slope of the terrain in radians
+
+This formula basically says that the propensity for soil saturation is higher in flat 
+places and in places downstream the catchment. In a map it should look like this:
+
+![twi](https://github.com/ipo-exe/planslab/blob/main/data/twi.png "twi")
+
+
+There is some physical justification for the `TWI` standard formula, which was derived based on 
+a set of assumptions. We invite you to come with some new hypothesis for a saturation
+propensity index. Here we got a new saturation index, the `HTWI`, which uses the `HAND` and `TWI`
+in a composite formula:
+
+![htwi](https://github.com/ipo-exe/planslab/blob/main/data/htwi.png "htwi")
+
+## local deficits and variable source area
+
+
+
 
 ## recipes
 

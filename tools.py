@@ -9,6 +9,7 @@ def slh_sim_g2g(fseries, ftwi, fbasin,
                 fcpmax='none',
                 fsfmax='none',
                 froots='none',
+                fksat='none',
                 pannel=True,
                 trace=True,
                 tracevars='Cpy-D',
@@ -53,9 +54,6 @@ def slh_sim_g2g(fseries, ftwi, fbasin,
     qt0 = param_dct['qo']['Set'] / 100
     k = param_dct['k']['Set']
     n = param_dct['n']['Set']
-    if tui:
-        print(param_df.to_string())
-    cpmax = param_dct['cpmax']['Set']
     if fcpmax != 'none':
         if tui:
             status('importing canopy index map')
@@ -71,6 +69,11 @@ def slh_sim_g2g(fseries, ftwi, fbasin,
             status('importing roots index map')
         meta, roots_map = inout.inp_asc_raster(file=froots, dtype='float32')
         roots = roots_map * roots
+    if fksat != 'none':
+        if tui:
+            status('importing ksat index map')
+        meta, ksat_map = inout.inp_asc_raster(file=fksat, dtype='float32')
+        ksat = ksat_map * ksat
     if tui:
         status('running model')
     sim = model.sim_g2g(series_df=df,
@@ -130,9 +133,9 @@ def slh_sim_g2g(fseries, ftwi, fbasin,
                 ranges = (0, 1)
                 v_scale = 1
             else:
-                ranges = (np.min(sim['Maps'][v]) / scale, np.max(sim['Maps'][v]) / scale)
+                ranges = (np.min(sim['Trace'][v]) / scale, np.max(sim['Trace'][v]) / scale)
                 v_scale = scale
-            export_map_views(map3d=sim['Maps'][v],
+            export_map_views(map3d=sim['Trace'][v],
                              series=sim['Series'],
                              meta=meta,
                              ranges=ranges,
