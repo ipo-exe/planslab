@@ -1,3 +1,4 @@
+import matplotlib.pyplot as plt
 import numpy as np
 
 
@@ -55,7 +56,7 @@ def topmodel_qb(d, qo, m):
     return qo * np.exp(-d/m)
 
 
-def topmodel_qv(d, unz, ksat):
+def topmodel_qv(d, unz, ksat, threshold=0.001):
     """
     Global and local vertical recharge rate function (Beven and Woods.. )
 
@@ -64,7 +65,7 @@ def topmodel_qv(d, unz, ksat):
     :param ksat: velocity parameter in mm/d
     :return: vertical recharge rate
     """
-    return ksat * (unz / (d + 0.001)) * (d > 0)  # + 0.001 to avoid division by zero
+    return ksat * (unz / (d + threshold)) * (d > 0)  # threshold to avoid division by zero
 
 
 def topmodel_di(d, twi, m, lamb):
@@ -77,7 +78,6 @@ def topmodel_di(d, twi, m, lamb):
     :return: 1d bins array of local deficit
     """
     lcl_di = d + m * (lamb - twi)
-    #avg_di = avg_2d(lcl_di, aoi)
     mask = 1.0 * (lcl_di > 0)
     lcl_di2 =  np.abs(lcl_di * mask)  # set negative deficit to zero
     return lcl_di2
@@ -92,44 +92,49 @@ def topmodel_vsai(di):
     return ((di == 0) * 1)
 
 
-def sim_g2g(series_df, basin, twi, qt0, cpmax, sfmax, roots, qo, m, lamb, ksat, n=2, k=1, scale=1000):
+def sim_g2g(series_df, basin, twi, qt0, cpmax, sfmax, roots, qo, m, lamb, ksat, n=2, k=1,
+            scale=1000,
+            trace=True,
+            tracevars='D-Cpy',
+            integrate=False,
+            integratevars='D-Qv'):
     from sys import getsizeof
-    import matplotlib.pyplot as plt
-    stocks_lbls = ['D',  # saturated water stock deficit
-                   'Unz',  # unsaturated zone water stock
-                   'Sfs',  # surface water stock
-                   'Cpy',  # canopy water stock
-                   'VSA']  # variable source area
-    flows_lbls = ['Prec',  # precipitation
-                  'PET',  # potential evapotranspiration
-                  'Intc',  # interceptation in canopy
-                  'Ints',  # interceptation in surface
-                  'TF',  # throughfall
-                  'R',  # runoff
-                  'Inf',  # infiltration
-                  'Qv',  # recharge
-                  'Evc',  # evaporation from the canopy
-                  'Evs',  # evaporation from the surface
-                  'Tpun',  # transpiration from the unsaturated zone
-                  'Tpgw',  # transpiration from the saturated zone
-                  'ET',  # evapotranspiration
-                  'Qb',  # baseflow
-                  'Qs',  # stormflow
-                  'Q']  # streamflow
+    #import matplotlib.pyplot as plt
+    # stock variables
+    simvars = ['D',    # saturated water stock deficit
+               'Unz',  # unsaturated zone water stock
+               'Sfs',  # surface water stock
+               'Cpy',  # canopy water stock
+               'VSA',  # variable source area
+               'Prec', # precipitation
+               'PET',  # potential evapotranspiration
+               'Intc', # interceptation in canopy
+               'Ints', # interceptation in surface
+               'TF',   # throughfall
+               'R',    # runoff
+               'RIE',  # infiltration excess runoff (Hortonian)
+               'RSE',  # saturation excess runoff (Dunnean)
+               'RC',   # runofff coeficient (%)
+               'Inf',  # infiltration
+               'Qv',   # recharge
+               'Evc',  # evaporation from the canopy
+               'Evs',  # evaporation from the surface
+               'Tpun', # transpiration from the unsaturated zone
+               'Tpgw', # transpiration from the saturated zone
+               'ET',   # evapotranspiration
+               'Qb',   # baseflow
+               'Qs',   # stormflow
+               'Q']    # streamflow
 
     #
     # append global variables fields
     ts = series_df.copy()
-    for lbl  in stocks_lbls:
-        ts[lbl] = 0.0
-    for lbl in flows_lbls:
-        if lbl == 'Prec' or lbl == 'PET':
+    for v in simvars:
+        if v == 'Prec' or v == 'PET':
             pass
         else:
-            ts[lbl] = 0.0
+            ts[v] = 0.0
     #
-    # set global deficit initial conditions
-    ts['D'].values[0] = topmodel_d0(qt0=qt0, qo=qo, m=m)
     #
     # get map shape
     shape = np.shape(twi)
@@ -137,141 +142,195 @@ def sim_g2g(series_df, basin, twi, qt0, cpmax, sfmax, roots, qo, m, lamb, ksat, 
     cols = shape[1]
     tlen = len(ts)
     #
-    # deploy map series
+    # deploy simulation maps
     mps = dict()
     mem_size = 0
-    for lbl  in stocks_lbls:
-        mps[lbl] = np.zeros(shape=(tlen, rows, cols), dtype='int32')
-        mem_size = getsizeof(mps[lbl]) + mem_size
-    for lbl in flows_lbls:
-        if lbl == 'Qb' or lbl == 'Qs' or lbl == 'Q':
+    for v in simvars:
+        if v == 'Qb' or v == 'Qs' or v == 'Q':
             pass
         else:
-            mps[lbl] = np.zeros(shape=(tlen, rows, cols), dtype='int32')
-            mem_size = getsizeof(mps[lbl]) + mem_size
-    # insert Prec and PET maps
-    for t in range(tlen):
-        mps['Prec'][t] = scale * ts['Prec'].values[t] * (mps['Prec'][t] + 1)
-        mps['PET'][t] = scale * ts['PET'].values[t] * (mps['PET'][t] + 1)
-    print('Size : {} MB'.format(mem_size / 1000000))
+            mps[v] = np.zeros(shape=shape, dtype='int32')
+            mem_size = getsizeof(mps[v]) + mem_size
+    #print('Sim size : {} MB'.format(mem_size / 1000000))
+    mps_trace = dict()
+    if trace:
+        tracevars = tracevars.split('-')
+        mem_size = 0
+        for v in tracevars:
+            mps_trace[v] = np.zeros(shape=(tlen, rows, cols), dtype='int32')
+            mem_size = getsizeof(mps_trace[v]) + mem_size
+    #print('Trace size : {} MB'.format(mem_size / 1000000))
+    mps_integrate = dict()
+    if integrate:
+        integratevars = integratevars.split('-')
+        for v in integratevars:
+            mps_integrate[v] = np.zeros(shape=(rows, cols), dtype='int32')
     #
     # get initial local deficits
-    mps['D'][0] = topmodel_di(d=ts['D'].values[0], twi=twi, m=m, lamb=lamb)
+    ts['D'].values[0] = topmodel_d0(qt0=qt0, qo=qo, m=m)
+    mps['D'] = scale * topmodel_di(d=ts['D'].values[0], twi=twi, m=m, lamb=lamb)
+    mps['VSA'] = topmodel_vsai(di=mps['D'])
     #
     #
     # ESMA loop
-    for t in range(1, tlen):
-        #
-        # Canopy water balance
-        mps['Cpy'][t] = mps['Cpy'][t - 1] + mps['Intc'][t - 1] - mps['Evc'][t - 1]
-        ts['Cpy'].values[t] = avg_2d(var2d=mps['Cpy'][t], weight=basin) / scale  # compute basin-wide avg
-        #
-        # Surface water balance
-        mps['Sfs'][t] = mps['Sfs'][t - 1] + mps['Ints'][t - 1] - mps['Inf'][t - 1] - mps['Evs'][t - 1]
-        ts['Sfs'].values[t] = avg_2d(var2d=mps['Sfs'][t], weight=basin) / scale  # compute basin-wide avg
-        #
-        # Unsaturated zone water balance
-        mps['Unz'][t] = mps['Unz'][t - 1] + mps['Inf'][t - 1] - mps['Qv'][t - 1] - mps['Tpun'][t - 1]
-        ts['Unz'].values[t] = avg_2d(var2d=mps['Unz'][t], weight=basin) / scale  # compute basin-wide avg
-        #
-        # Deficit update:
-        ts['D'].values[t] = ts['D'].values[t - 1] - ts['Qv'].values[t - 1] + ts['Qb'].values[t - 1] + ts['Tpgw'].values[t - 1]
-        mps['D'][t] = scale * topmodel_di(d=ts['D'].values[t], twi=twi, m=m, lamb=lamb)
-        #
-        # VSA update
-        mps['VSA'][t] = topmodel_vsai(di=mps['D'][t])
-        ts['VSA'].values[t] = 100 * np.sum(mps['VSA'][t] * basin) / np.sum(basin) # in %
-        #
-        # Baseflow
-        ts['Qb'].values[t] = topmodel_qb(d=ts['D'].values[t], qo=qo, m=m)
+    for t in range(tlen):
+        # INPUT define Prec and PET
+        mps['Prec'] = ts['Prec'].values[t] * scale * np.ones(shape=shape, dtype='int32')
+        mps['PET'] = ts['PET'].values[t] * scale * np.ones(shape=shape, dtype='int32')
 
+        # STOCKS WATER BALANCE (backward looking)
+        if t > 0:
+            # Canopy water balance
+            mps['Cpy'] = mps['Cpy'] + mps['Intc'] - mps['Evc']
+            ts['Cpy'].values[t] = avg_2d(var2d=mps['Cpy'], weight=basin) / scale  # compute basin-wide avg
+            #
+            # Vadose zone water balance
+            mps['Unz'] = mps['Unz'] + mps['Inf'] - mps['Qv'] - mps['Tpun']
+            ts['Unz'].values[t] = avg_2d(var2d=mps['Unz'], weight=basin) / scale  # compute basin-wide avg
+            #
+            # Surface water balance
+            mps['Sfs'] = mps['Sfs'] + mps['Ints'] - mps['Inf'] - mps['Evs']
+            ts['Sfs'].values[t] = avg_2d(var2d=mps['Sfs'], weight=basin) / scale  # compute basin-wide avg
+            #
+            # Deficit water balance
+            ts['D'].values[t] = ts['D'].values[t - 1] + ts['Qb'].values[t - 1] + ts['Tpgw'].values[t - 1] - \
+                                ts['Qv'].values[t - 1]
+            # update Deficit
+            mps['D'] = scale * topmodel_di(d=ts['D'].values[t], twi=twi, m=m, lamb=lamb)
+            # update VSA
+            mps['VSA'] = topmodel_vsai(di=mps['D'])
+            ts['VSA'].values[t] = 100 * avg_2d(var2d=mps['VSA'], weight=basin) / scale  # compute basin-wide avg
 
+        # FLOWS COMPUTATION
 
-        # ---- Canopy
+        # --- Canopy flows
 
-        # potential interceptation
-        p_intc = (cpmax * scale) - mps['Cpy'][t]
+        # potential interceptation on canopy
+        p_intc = (scale * cpmax) - mps['Cpy']
         #
         # Interceptation in the canopy
-        mps['Intc'][t] = (mps['Prec'][t] * (mps['Prec'][t] <= p_intc)) + (p_intc * ((mps['Prec'][t] > p_intc)))
-        ts['Intc'].values[t] = avg_2d(var2d=mps['Intc'][t], weight=basin) / scale  # compute basin-wide avg
+        mps['Intc'] = (p_intc * (mps['Prec'] > p_intc)) + (mps['Prec'] * (mps['Prec'] <= p_intc))
+        ts['Intc'].values[t] = avg_2d(var2d=mps['Intc'], weight=basin) / scale  # compute basin-wide avg
+        #
+        # Evaporation in the canopy
+        mps['Evc'] = (mps['PET'] * (mps['Cpy'] > mps['PET'])) + (mps['Cpy'] * (mps['Cpy'] <= mps['PET']))
+        ts['Evc'].values[t] = avg_2d(var2d=mps['Evc'], weight=basin) / scale  # compute basin-wide avg
+        #
+        # update PET
+        mps['PET'] = mps['PET'] - np.mean(mps['Evc'])
         #
         # Throughfall
-        mps['TF'][t] = mps['Prec'][t] - mps['Intc'][t]
-        ts['TF'].values[t] = avg_2d(var2d=mps['TF'][t], weight=basin) / scale
+        mps['TF'] = mps['Prec'] - mps['Intc']
+        ts['TF'].values[t] = avg_2d(var2d=mps['TF'], weight=basin) / scale  # compute basin-wide avg
+
+
+        # --- Transpiration from groundwater
+
+        # potential tp from gw:
+        p_tpgw = (roots * scale) - mps['D']
+        p_tpgw = p_tpgw * (p_tpgw >= 0) # remove negative values
         #
-        # Evaporation from the canopy
-        mps['Evc'][t] = (mps['Cpy'][t] * (mps['Cpy'][t] <= mps['PET'][t])) + (mps['PET'][t] * (mps['Cpy'][t] > mps['PET'][t]))
-        ts['Evc'].values[t] = avg_2d(var2d=mps['Evc'][t], weight=basin) / scale  # compute basin-wide avg
-        pet_update = mps['PET'][t] - mps['Evc'][t]  # update PET
-
-        # ---- Saturated Root Zone - transpiration
-
-        p_tpgw = ((roots * scale) - mps['D'][t]) * (((roots * scale) - mps['D'][t]) > 0)
-        mps['Tpgw'][t] = (pet_update * (p_tpgw >= pet_update)) + (p_tpgw * (p_tpgw < pet_update))
-        ts['Tpgw'].values[t] = avg_2d(var2d=mps['Tpgw'][t], weight=basin) / scale  # compute basin-wide avg
-        pet_update = pet_update - mps['Tpgw'][t]  # update PET
-
-
-        # ---- Surface (runoff and inf)
-
-
-        # potential Sfs
-        p_ints = (sfmax * scale) - mps['Sfs'][t]
+        # Transpiration from groundwater
+        mps['Tpgw'] = (mps['PET'] * (p_tpgw > mps['PET'])) + (p_tpgw * (p_tpgw <= mps['PET']))
+        ts['Tpgw'].values[t] = avg_2d(var2d=mps['Tpgw'], weight=basin) / scale  # compute basin-wide avg
         #
-        # Interceptation in the surface
-        mps['Ints'][t] = (mps['TF'][t] * (mps['TF'][t] <= p_ints)) + (p_ints * ((mps['TF'][t] > p_ints)))
-        ts['Ints'].values[t] = avg_2d(var2d=mps['Ints'][t], weight=basin) / scale  # compute basin-wide avg
+        # update PET
+        mps['PET'] = mps['PET'] - np.mean(mps['Tpgw'])
+
+        # ---- Interceptation on the surface
+
+        # potential Infs
+        p_ints = (sfmax * scale) - mps['Sfs']
         #
+        # Interceptation on the surface
+        mps['Ints'] = (p_ints * (mps['TF'] > p_ints)) + (mps['TF'] * (mps['TF'] <= p_ints))
+        ts['Ints'].values[t] = avg_2d(var2d=mps['Ints'], weight=basin) / scale  # compute basin-wide avg
+
+        # ---- Runoff
+
         # Runoff
-        mps['R'][t] = mps['TF'][t] - mps['Ints'][t]
-        ts['R'].values[t] = avg_2d(var2d=mps['R'][t], weight=basin) / scale # compute basin-wide avg
+        mps['R'] = mps['TF'] - mps['Ints']
+        ts['R'].values[t] = avg_2d(var2d=mps['R'], weight=basin) / scale  # compute basin-wide avg
         #
-        # surface top-down potential inf
-        p_inf_sfs = (mps['Sfs'][t] * (mps['Sfs'][t] < (ksat * scale))) + ((ksat * scale) * (mps['Sfs'][t] < (ksat * scale)))
+        # Runoff component -  RIE
+        mps['RIE'] = mps['R'] * (mps['VSA'] != 1)
+        ts['RIE'].values[t] = avg_2d(var2d=mps['RIE'], weight=basin) / scale  # compute basin-wide avg
         #
-        # potential infiltration allowed by the usaturated zone water content:
-        p_inf_unz = (mps['D'][t] - mps['Unz'][t]) * ((mps['D'][t] - mps['Unz'][t])> 0)
+        # Runoff components -  RSE
+        mps['RSE'] = mps['R'] * (mps['VSA'] == 1)
+        ts['RSE'].values[t] = avg_2d(var2d=mps['RSE'], weight=basin) / scale  # compute basin-wide avg
+        #
+        # Runoff components -  RC
+        if ts['Prec'].values[t] > 0:  # avoid division by zero
+            mps['RC'] = 100 * mps['R'] / mps['Prec']
+        else:
+            mps['RC'] = mps['RC'] * 0
+        ts['RC'].values[t] = avg_2d(var2d=mps['RC'], weight=basin) # compute basin-wide avg
+
+        # ---- Infiltration
+        # potential infiltration allowed by surface water
+        p_infs = ((ksat * scale) * (mps['Sfs'] > (ksat * scale))) + (mps['Sfs'] * (mps['Sfs'] <= (ksat * scale)))
+        #
+        # potential infiltration allowed by the vadose zone
+        p_infu = (mps['D'] - mps['Unz']) * ((mps['D'] - mps['Unz']) > 0)  # ensure positive values only - Deficit update
         #
         # Infiltration
-        mps['Inf'][t] = (p_inf_sfs * (p_inf_sfs < p_inf_unz)) + (p_inf_unz * (p_inf_sfs >= p_inf_unz))
-        ts['Inf'].values[t] = avg_2d(var2d=mps['Inf'][t], weight=basin) / scale # compute basin-wide avg
+        mps['Inf'] = (p_infu * (p_infs > p_infu)) + (p_infs * (p_infs <= p_infu))
+        ts['Inf'].values[t] = avg_2d(var2d=mps['Inf'], weight=basin) / scale  # compute basin-wide avg
 
+        # ---- Recharge
 
-        # ----- Unsat zone
-
-
-        # potential qv recharge rate without PET:
-        p_qv = topmodel_qv(d=mps['D'][t], unz=mps['Unz'][t], ksat=(ksat * scale))
+        # Vadose zone saturation
+        unz_sat = mps['Unz'] / mps['D']
+        unz_sat = np.nan_to_num(unz_sat, nan=0)
+        unz_sat = (unz_sat * (unz_sat <= 1)) + (1 * (unz_sat > 1))
         #
-        # actual qv recharge rate with PET (proportional to ratio):
-        mps['Qv'][t] = mps['Unz'][t] * (p_qv / (pet_update + p_qv + 1)) * ((pet_update + p_qv) > 0)  # + 1 to avoid division by zero
-        ts['Qv'].values[t] = avg_2d(var2d=mps['Qv'][t], weight=basin) / scale  # compute basin-wide avg
+        # potential recharge
+        p_qv = (ksat * scale) * unz_sat
         #
-        # compute potential tpun transpiration rate (gated by roots and proportional to ratio):
-        p_tpun = mps['Unz'][t] * (mps['Unz'][t] <= (roots * scale)) + (roots * scale) * (mps['Unz'][t] > (roots * scale))
-        p_tpun = p_tpun * (pet_update / (pet_update + p_qv + 1)) * ((pet_update + p_qv) > 0)  # + 1 to avoid division by zero
+        # Recharge
+        mps['Qv'] = (p_qv * (mps['Unz'] > p_qv)) + (mps['Unz'] * (mps['Unz'] <= p_qv))
+        ts['Qv'].values[t] = avg_2d(var2d=mps['Qv'], weight=basin) / scale  # compute basin-wide avg
+
+        # ---- Transpiration from vadose zone
         #
-        # transpiration from the unsaturated zone
-        tpun_i = (pet_update * (p_tpun >= pet_update)) + (p_tpun * (p_tpun < pet_update))
-        ts['Tpun'].values[t] = avg_2d(var2d=mps['Tpun'][t], weight=basin) / scale  # compute basin-wide avg
-        pet_update = pet_update - mps['Tpun'][t]  # update PET
-
-
-        # ---- Surface (evaporation)
-
-        # potential evap
-        p_evs = mps['Sfs'][t] - mps['Inf'][t]
+        # transpiration factor for accounting root depth in the vadoze zone
+        tp_factor = ((roots * scale) / (mps['D']))
+        tp_factor = np.nan_to_num(tp_factor, nan=1, posinf=1) # avoid nan values where D is 0
+        tp_factor = (tp_factor * (tp_factor < 1)) + (1 * (tp_factor >= 1))
+        #
+        # potential tp
+        p_tpun_1 = (mps['Unz'] - mps['Qv'])
+        p_tpun = (p_tpun_1 * ((roots * scale) > mps['D'])) + (p_tpun_1 * tp_factor * ((roots * scale) <= mps['D']))
+        #
+        # Transpiration from vadose zone
+        mps['Tpun'] = (mps['PET'] * (p_tpun > mps['PET'])) + (p_tpun * (p_tpun <= mps['PET']))
+        ts['Tpun'].values[t] = avg_2d(var2d=mps['Tpun'], weight=basin) / scale  # compute basin-wide avg
+        #
+        # update PET
+        mps['PET'] = mps['PET'] - np.mean(mps['Tpun'])
 
         # Evaporation from the surface
-        # todo fix negative values
-        mps['Evs'][t] = (p_evs * (p_evs <= pet_update)) + (pet_update * (p_evs > pet_update))
-        ts['Evs'].values[t] = avg_2d(var2d=mps['Evs'][t], weight=basin) / scale  # compute basin-wide avg
+        # potential Evs
+        p_evs = mps['Sfs'] - mps['Inf']
+        # Evs
+        mps['Evs'] = (mps['PET'] * (p_evs > mps['PET'])) + (p_evs * (p_evs <= mps['PET']))
+        ts['Evs'].values[t] = avg_2d(var2d=mps['Evs'], weight=basin) / scale  # compute basin-wide avg
+
+        # --- Baseflow
+        ts['Qb'].values[t] = topmodel_qb(d=ts['D'].values[t], qo=qo, m=m)
+
+        # --- ET
+        mps['ET'] = mps['Evc'] + mps['Evs'] + mps['Tpgw'] + mps['Tpun']
+        ts['ET'].values[t] = avg_2d(var2d=mps['ET'], weight=basin) / scale  # compute basin-wide avg
         #
-        #
-        # compute full ET signal
-        mps['ET'][t] = mps['Evc'][t] + mps['Evs'][t] + mps['Tpun'][t] + mps['Tpgw'][t]
-        ts['ET'].values[t] = avg_2d(var2d=mps['ET'][t], weight=basin) / scale  # compute basin-wide avg
+        # append to trace and integration
+        if trace:
+            for v in tracevars:
+                mps_trace[v][t] = mps[v]
+        if integrate:
+            for v in integratevars:
+                mps_integrate[v] = mps_integrate[v] + mps[v]
     #
     #
     # RUNOFF ROUTING by Nash Cascade of linear reservoirs
@@ -283,5 +342,10 @@ def sim_g2g(series_df, basin, twi, qt0, cpmax, sfmax, roots, qo, m, lamb, ksat, 
     # Compute full discharge Q = Qb + Qs
     ts['Q'] = ts['Qb'] + ts['Qs']
 
+    # fix stocks in integration:
+    if integrate:
+        for v in integratevars:
+            if v in ['D', 'Cpy', 'Sfs', 'Unz', 'VSA', 'RC']:
+                mps_integrate[v] = mps_integrate[v] / tlen
     # return
-    return ts
+    return {'Series': ts, 'Trace': mps_trace, 'Integration': mps_integrate}

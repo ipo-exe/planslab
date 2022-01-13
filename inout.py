@@ -1,4 +1,22 @@
 import numpy as np
+import pandas as pd
+
+def dataframe_prepro(dataframe, strfields='Field1,Field2', strf=True, date=False, datefield='Date'):
+    """
+    Convenience function for pre processing dataframes
+    :param dataframe: pandas dataframe object
+    :param strfields: iterable of string fields
+    :return: pandas dataframe
+    """
+    lcl_df = dataframe.copy()
+    lcl_df.columns = lcl_df.columns.str.strip()
+    if strf:
+        fields_lst = strfields.split(',')
+        for i in range(len(fields_lst)):
+            lcl_df[fields_lst[i]] = lcl_df[fields_lst[i]].str.strip()
+    if date:
+        lcl_df[datefield] = pd.to_datetime(lcl_df[datefield])
+    return lcl_df
 
 
 def inp_asc_raster(file, nan=False, dtype='int16'):
@@ -43,6 +61,27 @@ def inp_asc_raster(file, nan=False, dtype='int16'):
                     if def_array[i][j] == ndv:
                         def_array[i][j] = np.nan
     return meta_dct, def_array
+
+
+def inp_hydroparams(fhydroparam):
+    """
+    Import the hydrology reference parameters to a dictionary.
+    :param fhydroparam: hydro_param txt filepath
+    :return: dictionary of dictionaries of parameters Set, Min and Max and pandas dataframe
+    """
+    hydroparam_df = pd.read_csv(fhydroparam, sep=';')
+    hydroparam_df = dataframe_prepro(hydroparam_df, 'Parameter')
+    #
+    fields = ('Set', 'Min', 'Max')
+    params = ('m', 'lamb', 'qo', 'cpmax', 'sfmax', 'roots', 'ksat', 'k', 'n')
+    # built dict
+    hydroparams_dct = dict()
+    for p in params:
+        lcl_dct = dict()
+        for f in fields:
+            lcl_dct[f] = hydroparam_df[hydroparam_df['Parameter'] == p][f].values[0]
+        hydroparams_dct[p] = lcl_dct
+    return hydroparams_dct, hydroparam_df
 
 
 def out_asc_raster(array, meta, folder, filename, dtype='float32'):

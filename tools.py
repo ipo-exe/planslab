@@ -1,6 +1,204 @@
 import inout
 import numpy as np
 import pandas as pd
+import matplotlib.pyplot as plt
+
+
+def slh_sim_g2g(fseries, ftwi, fbasin,
+                fparams='none',
+                fcpmax='none',
+                fsfmax='none',
+                froots='none',
+                pannel=True,
+                trace=True,
+                tracevars='Cpy-D',
+                integrate=True,
+                integratevars='Cpy-D',
+                animate=True,
+                folder='C:/bin',
+                wkpl=True,
+                label='',
+                scale=1000,
+                tui=True):
+    import model
+    from backend import create_rundir, status
+    from visuals import pannel_global
+    import os
+    # folder setup
+    if wkpl:  # if the passed folder is a workplace, create a sub folder
+        if label != '':
+            label = label + '_'
+        folder = create_rundir(label=label + 'SLH', wkplc=folder)
+    #
+    # import data
+    if tui:
+        status('importing time series')
+    df = pd.read_csv(fseries, sep=';', parse_dates=['Date'])
+    if tui:
+        status('importing twi map')
+    meta, twi = inout.inp_asc_raster(file=ftwi, dtype='float32')
+    if tui:
+        status('importing basin map')
+    meta, basin = inout.inp_asc_raster(file=fbasin, dtype='float32')
+    if tui:
+        status('importing parameters')
+    param_dct, param_df = inout.inp_hydroparams(fhydroparam=fparams)
+    cpmax = param_dct['cpmax']['Set']
+    sfmax = param_dct['sfmax']['Set']
+    roots = param_dct['roots']['Set']
+    qo = param_dct['qo']['Set']
+    m = param_dct['m']['Set']
+    lamb = param_dct['lamb']['Set']
+    ksat = param_dct['ksat']['Set']
+    qt0 = param_dct['qo']['Set'] / 100
+    k = param_dct['k']['Set']
+    n = param_dct['n']['Set']
+    if tui:
+        print(param_df.to_string())
+    cpmax = param_dct['cpmax']['Set']
+    if fcpmax != 'none':
+        if tui:
+            status('importing canopy index map')
+        meta, cpmax_map = inout.inp_asc_raster(file=fcpmax, dtype='float32')
+        cpmax = cpmax_map * cpmax
+    if fsfmax != 'none':
+        if tui:
+            status('importing surface index map')
+        meta, sfmax_map = inout.inp_asc_raster(file=fsfmax, dtype='float32')
+        sfmax = sfmax_map * sfmax
+    if froots != 'none':
+        if tui:
+            status('importing roots index map')
+        meta, roots_map = inout.inp_asc_raster(file=froots, dtype='float32')
+        roots = roots_map * roots
+    if tui:
+        status('running model')
+    sim = model.sim_g2g(series_df=df,
+                        twi=twi,
+                        basin=basin,
+                        cpmax=cpmax,
+                        sfmax=sfmax,
+                        roots=roots,
+                        qo=qo,
+                        m=m,
+                        lamb=lamb,
+                        ksat=ksat,
+                        qt0=qt0,
+                        k=k,
+                        n=n,
+                        tracevars=tracevars,
+                        trace=trace,
+                        integrate=integrate,
+                        integratevars=integratevars,
+                        scale=scale)
+    sim_df = sim['Series']
+    sim_df['IRI'] = 0
+    sim_df['IRA'] = 0
+    if tui:
+        status('exporting series')
+    sim_df.to_csv('{}/sim_series.txt'.format(folder), sep=';', index=False)
+    if tui:
+        status('exporting parameters')
+    param_df.to_csv('{}/sim_params.txt'.format(folder), sep=';', index=False)
+    if pannel:
+        if tui:
+            status('exporting series pannel')
+        pannel_global(series_df=sim_df, folder=folder, show=False)
+    if trace:
+        from visuals import export_map_views
+        tracevars = tracevars.split('-')
+        trace_folder = folder + '/trace'
+        os.mkdir(trace_folder)
+        for v in tracevars:
+            if tui:
+                status('exporting {} frames'.format(v))
+            lcl_dir = trace_folder + '/{}_frames'.format(v)
+            os.mkdir(lcl_dir)
+            # get mapid
+            if v in ['Cpy', 'Sfs', 'Unz']:
+                mapid = 'stock'
+            elif v == 'VSA':
+                mapid = 'VSA'
+            elif v == 'D':
+                mapid = 'deficit'
+            elif v in ['Evc', 'Evs', 'Tpun', 'Tpgw', 'ET']:
+                mapid = 'flow_v'
+            else:
+                mapid = 'flow'
+
+            if v == 'VSA':
+                ranges = (0, 1)
+                v_scale = 1
+            else:
+                ranges = (np.min(sim['Maps'][v]) / scale, np.max(sim['Maps'][v]) / scale)
+                v_scale = scale
+            export_map_views(map3d=sim['Maps'][v],
+                             series=sim['Series'],
+                             meta=meta,
+                             ranges=ranges,
+                             mapid=mapid,
+                             mapttl=v,
+                             folder=lcl_dir,
+                             filename=v,
+                             metadata=True,
+                             integration=False,
+                             png=True,
+                             nodata=-1,
+                             scale=v_scale,
+                             tui=tui)
+            if animate:
+                import imageio
+                if tui:
+                    status('exporting {} gif animation'.format(v))
+                png_dir = lcl_dir
+                gifname = folder + '/{}_animation.gif'.format(v)
+                images = [] # empty list
+                for file_name in sorted(os.listdir(png_dir)):
+                    if file_name.endswith('.png'):
+                        file_path = os.path.join(png_dir, file_name)
+                        images.append(imageio.imread(file_path))
+                imageio.mimsave(uri=gifname, ims=images)
+    if integrate:
+        from visuals import plot_map_view
+        integratevars = integratevars.split('-')
+        integrate_folder = folder + '/integration'
+        os.mkdir(integrate_folder)
+        for v in integratevars:
+            if tui:
+                status('exporting {} integration'.format(v))
+            # get mapid
+            if v in ['Cpy', 'Sfs', 'Unz']:
+                mapid = 'stock'
+            elif v == 'VSA' or v == 'RC':
+                mapid = 'VSA'
+            elif v == 'D':
+                mapid = 'deficit'
+            elif v in ['Evc', 'Evs', 'Tpun', 'Tpgw', 'ET']:
+                mapid = 'flow_v'
+            else:
+                mapid = 'flow'
+            # get ranges
+            if v == 'VSA':
+                ranges = (0, 100)
+                v_scale = 1 / 100
+            elif v == 'RC':
+                ranges = (0, np.max(sim['Integration'][v]))
+                v_scale = 1
+            else:
+                ranges = (np.min(sim['Integration'][v]) / scale, np.max(sim['Integration'][v]) / scale)
+                v_scale = scale
+            kind = 'accumulation'
+            if v in ['D', 'Cpy', 'Sfs', 'Unz', 'VSA', 'RC']:
+                kind = 'average'
+            plot_map_view(map2d=sim['Integration'][v] / v_scale,
+                          ranges=ranges,
+                          meta=meta,
+                          metadata=True,
+                          mapid=mapid,
+                          mapttl='{} {} in {} days'.format(v, kind, str(int(len(df)))),
+                          filename='{}_integration'.format(v),
+                          folder=integrate_folder,
+                          integration=True)
 
 
 def sal_d_by_m(ftwi,
