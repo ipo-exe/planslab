@@ -1,6 +1,7 @@
 # planslab
 
-`planslab` is a python repository intended to be a laboratory for playing around with the `plans` model concepts, which itself is based in `TOPMODEL`.
+`planslab` is a python repository intended to be a laboratory for playing around with 
+the `plans` model concepts, which itself is based in `TOPMODEL`.
 
 ## local machines
 
@@ -12,10 +13,12 @@ To run `planslab` on a local machine you will need to pre-install:
 * `scipy`
 * `imageio`
 
-There is a lot of information on the web about how to do it for different operating systems, so go check it out. 
+There is a lot of information on the web about how to do it for different operating
+systems, so go check it out. 
 
 ## cloud - google colab
-Alternatively you may run `planslab` in the cloud using google's `colab` platform so you do not need to worry about any of these libraries.
+Alternatively you may run `planslab` in the cloud using google's `colab` platform so 
+you do not need to worry about any of these libraries.
 1) create a google account for you;
 2) create a `colab` blank notebook on https://colab.research.google.com/;
 3) clone this repository;
@@ -30,10 +33,9 @@ Alternatively you may run `planslab` in the cloud using google's `colab` platfor
 
 `TOPMODEL` (Beven & Kirkby, 1979) is a semi-distributed hydrological model, 
 so is it based on the _hydrological similarity_ concept. 
-It uses topographical information to predict the **propensity to soil saturation** in 
-different
-places within a given catchment. Such _similarity index_ is named `TWI` or 
-_Topographical Wetness Index_ and it may be computed in a map grid as follows:
+It uses topographical information to predict the **propensity to soil saturation** 
+in different places within a given catchment. Such _similarity index_ is named 
+`TWI` or _Topographical Wetness Index_ and it may be computed in a map grid as follows:
 
 ```markdown
 TWI = ln (flowacc / (n * tan(slope)))
@@ -52,14 +54,41 @@ places and in places downstream the catchment. In a map it should look like this
 
 There is some physical justification for the `TWI` standard formula, which was derived 
 mathmatically after a set of assumptions. We invite you to come with some new 
-hypothesis for a saturation propensity index. Here we got a new saturation index,
-the `HTWI`, which uses the `HAND` and `TWI` in a composite formula:
+hypothesis for a saturation propensity index. For instance, here we provide a new 
+saturation propensity index, the `HTWI`, which uses the `HAND` (height above the 
+nearest drainage) and `TWI` in a composite formula:
 
 ![htwi](https://github.com/ipo-exe/planslab/blob/main/data/htwi.png "htwi")
 
 ## local deficits and variable source area
 
+But how `TWI` helps modelling? As you may realize, `TWI` is just an static map. In fact,
+`TOPMODEL` uses the `TWI` for mapping the _local_ soil saturation _deficit_, while 
+the _global deficit_ is kept in check using a lumped classic approach.
 
+The mapping formula is:
+
+```markdown
+di = d + m * (lambda - twi) , di >= 0
+```
+Where:
+* `di` is the local deficit (i.e., the deficit map) in mm;
+* `d` is the global deficit (i.e., the basin-wide deficit) in mm;
+* `m` is an scaling parameter in mm;
+* `twi` is the `TWI` map;
+* `lambda` is the basin-wide`TWI` average value.
+
+By coupling this to a hydrology model we may derived maps of deficit for each 
+simulation timestep:
+
+![d_anim](https://github.com/ipo-exe/planslab/blob/main/docs/animation_d.gif "d")
+
+Place where full saturation happens is where the local deficit is zero. Any rainfall
+that manages to hit such areas would eventually flow off the catchment as saturation
+excess runoff. And since the deficit map is dynamic, we can visualize the 
+Variable Source Area `VSA` for each simulation timestep:
+
+![vsa_anim](https://github.com/ipo-exe/planslab/blob/main/docs/animation_vsa.gif "VSA")
 
 
 ## recipes
