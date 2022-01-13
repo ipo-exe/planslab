@@ -78,20 +78,85 @@ Where:
 * `twi` is the `TWI` map;
 * `lambda` is the basin-wide`TWI` average value.
 
-By coupling this to a hydrology model we may derived maps of deficit for each 
+By coupling this to a hydrology model we may compute deficit maps for each 
 simulation timestep:
 
 ![d_anim](https://github.com/ipo-exe/planslab/blob/main/docs/animation_d.gif "d")
 
-Place where full saturation happens is where the local deficit is zero. Any rainfall
+A place where full saturation happens is where the local deficit is zero. Any rainfall
 that manages to hit such areas would eventually flow off the catchment as saturation
-excess runoff. And since the deficit map is dynamic, we can visualize the 
-Variable Source Area `VSA` for each simulation timestep:
+excess runoff. And since the deficit map is dynamic, we can also visualize the 
+Variable Source Area `VSA` maps for each simulation timestep:
 
 ![vsa_anim](https://github.com/ipo-exe/planslab/blob/main/docs/animation_vsa.gif "VSA")
 
 
-## recipes
+## model structure
+
+`plans` is sligthly more complicated than the original `TOPMODEL`, since it has more 
+water stocks and related parameters. 
+
+The local structure of `plans`:
+
+![lcl](https://github.com/ipo-exe/plans3/blob/main/docs/figs/local_model.PNG "lcl")
+
+The local structure of `plans`:
+
+![gbl](https://github.com/ipo-exe/plans3/blob/main/docs/figs/global_model.PNG "gbl")
+
+
+## baseflow `Qb`
+
+The baseflow equation of `TOPMODEL` and `plans` is the hypothesis of soil 
+exponential depletion:
+```markdown
+Qb = qo * exp(-d / m)
+```
+Where:
+* `Qb` is the baseflow in mm/d;
+* `qo` is the maximum baseflow in the condition of full saturation in mm/d;
+* `d` is the global deficit in mm;
+* `m` is the scaling parameter (or decay parameter) in mm;
+
+## recharge `Qv`
+
+Recharge is a vertical flow in the vadose zone (unsaturated zone). At the local
+level, the hypothesis is that it tends to be the daily hydraulic conductivity
+as this stock gets saturated:
+
+```markdown
+Qvi = ksat * unzi / di
+```
+Where:
+* `Qvi` is the local recharge in mm/d;
+* `ksat` is the daily hydraulic conductivity in mm/d;
+* `unzi` is the local water stock in the vadose zone;
+* `di` is the local deficit in mm;
+
+## processing
+
+### `hist`: the histogram approach
+One important advantage of the similarity concept is that it allows fast processing. 
+To avoid large grid computations all you need is to process the _histogram_ of discrete
+hydrological units and only later scale the variables back in the map. 
+
+This `hist` approach is mostly appealing for large basins, calibration exercices and 
+uncertainty estimation.
+
+However, it demands some sacrifice in spatial continuity.
+
+### `g2g` : grid to grid 
+
+When computation speed (and memory!) is not a constrain, one may process the model in 
+a _grid to grid_ (`g2g`) mode. This approach process the whole grid of the basin so the
+modeller has the freedom do provide detailed parameter maps.
+
+For instance, consider the hypothesis that the observed `NDVI` in a given basin may be a 
+good proxy for the heterogeneity of the canopy water stock capacity. In `g2g` mode
+all you need to do is provide the `NDVI` map as the spatial proxy paramater.
+
+
+# recipes
 
 Included in the repo there is this `cookbook.py` file. you may check it for some neat examples.
 
