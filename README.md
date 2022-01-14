@@ -357,7 +357,7 @@ More cool gif animation:
 
 ### playing with the model
 
-The model is a python function that requires some inputs parameters. 
+The model is a python function that requires some input parameters. 
 So if you want to play directly with the model you may need some
 help:
 
@@ -426,8 +426,8 @@ sim_g2g(series_df, basin, twi, qt0, cpmax, sfmax, roots, qo, m, lamb, ksat, n, k
      'Trace': dict of 3d numpy arrays of traced variables,
      'Integration': dict of 2d numpy arrays of integrated variables}
 ```
-
-A very basic simulation run would look like this:
+### the basic script
+A very basic simulation script would look like this:
 ```python
 import pandas as pd
 import matplotlib.pyplot as plt
