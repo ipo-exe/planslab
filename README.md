@@ -53,7 +53,7 @@ places and in places downstream the catchment. In a map it should look like this
 
 
 There is some physical justification for the `TWI` standard formula, which was derived 
-mathmatically after a set of assumptions. We invite you to come with some new 
+mathematically after a set of assumptions. We invite you to come with some new 
 hypothesis for a saturation propensity index. For instance, here we provide a new 
 saturation propensity index, the `HTWI`, which uses the `HAND` (height above the 
 nearest drainage) and `TWI` in a composite formula:
@@ -100,7 +100,7 @@ The local structure of `plans`:
 
 ![lcl](https://github.com/ipo-exe/plans3/blob/main/docs/figs/local_model.PNG "lcl")
 
-The local structure of `plans`:
+The global structure of `plans`:
 
 ![gbl](https://github.com/ipo-exe/plans3/blob/main/docs/figs/global_model.PNG "gbl")
 
