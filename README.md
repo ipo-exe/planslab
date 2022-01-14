@@ -27,6 +27,8 @@ you do not need to worry about any of these libraries.
 6) upload all data files in the directory you just created;
 7) start writing your scripts.
 
+---
+
 # some basics
 
 ## the `TWI` 
@@ -93,20 +95,58 @@ Variable Source Area `VSA` maps for each simulation timestep:
 
 ## model structure
 
-`plans` is sligthly more complicated than the original `TOPMODEL`, since it has more 
-water stocks and related parameters. 
+The local structure of `TOPMODEL` is quite simple: it has a root zone water stock, the
+vadose zone water stock (unsaturated zone) and the saturated zone water stock 
+(calculated as the saturation deficit). `plans` is sligthly more complicated than 
+the original `TOPMODEL`, since it has more water stocks and related parameters. 
+In `plans` there is a canopy water stock, a surface water stock (representing both 
+depressions and organic soil horizon) and the root zone stock is actually a 
+threshold depth within the vadose and saturated water stocks.
 
-The local structure of `plans`:
-
-![lcl](https://github.com/ipo-exe/plans3/blob/main/docs/figs/local_model.PNG "lcl")
-
-The global structure of `plans`:
+The global structure of `plans` (similar of `TOPMODEL`):
 
 ![gbl](https://github.com/ipo-exe/plans3/blob/main/docs/figs/global_model.PNG "gbl")
 
+The local structure of `plans` includes some extra parameters:
+* `cpmax`: canopy water stock capacity, in mm;
+* `sfmax`: surface water stock capacity, in mm, and;
+* `erz` (or simply `roots`): effective root zone depth, in mm.
+
+![lcl](https://github.com/ipo-exe/plans3/blob/main/docs/figs/local_model.PNG "lcl")
+
+
+
+## recharge `Qv`
+
+Recharge is a vertical flow in the vadose zone (unsaturated zone). At the local
+level, the hypothesis is that it tends to be the daily hydraulic conductivity
+as this stock gets saturated:
+
+```markdown
+qvi = ksat * unzi / di
+```
+Where:
+* `qvi` is the local recharge in mm/d;
+* `ksat` is the daily hydraulic conductivity in mm/d;
+* `unzi` is the local water stock in the vadose zone;
+* `di` is the local deficit in mm;
+
+As any global variable, global recharge `Qv` is the basin-wide average of `qvi`:
+```markdown
+Qv = avg(qvi)
+```
+
+## streamflow `Q`
+
+Streamflow is the sum of baseflow `Qb` and stormflow `Qs`:
+
+```markdown
+Q = Qb + Qs
+```
 
 ## baseflow `Qb`
 
+Baseflow is the streamflow component coming soil water drainage. 
 The baseflow equation of `TOPMODEL` and `plans` is the hypothesis of soil 
 exponential depletion:
 ```markdown
@@ -118,53 +158,55 @@ Where:
 * `d` is the global deficit in mm;
 * `m` is the scaling parameter (or decay parameter) in mm;
 
-## recharge `Qv`
+## stormflow `Qs`
 
-Recharge is a vertical flow in the vadose zone (unsaturated zone). At the local
-level, the hypothesis is that it tends to be the daily hydraulic conductivity
-as this stock gets saturated:
+Stormflow is the streamflow component coming from runoff `R`. While runoff is computed as a local
+variable, stormflow is the output at the basin outlet. The routing procedure in `plans` is the
+`nash` model, that is, a cascade of linear reservoirs. 
+
+For a pulse of runoff `r` at timestep `t`:
 
 ```markdown
-Qvi = ksat * unzi / di
+Qs = R * ((t / k) ^ (n - 1)) * exp(- t / k) / (k * gamma(n)), n >= 1, k >= 1
 ```
 Where:
-* `Qvi` is the local recharge in mm/d;
-* `ksat` is the daily hydraulic conductivity in mm/d;
-* `unzi` is the local water stock in the vadose zone;
-* `di` is the local deficit in mm;
+* `n` is the number of linear reservoirs;
+* `k` is the detention time of the linear reservoirs, in days;
 
 ## processing
 
 ### `hist`: the histogram approach
 One important advantage of the similarity concept is that it allows fast processing. 
-To avoid large grid computations all you need is to process the _histogram_ of discrete
-hydrological units and only later scale the variables back in the map. 
+To avoid large grid computations all you need is to process discrete
+hydrological units and only later use the _histogram_ of such units to scale the 
+variables back in the map. 
 
 This `hist` approach is mostly appealing for large basins, calibration exercices and 
-uncertainty estimation.
+uncertainty estimation. However, this mode demands some level of sacrifice in 
+spatial continuity.
 
-However, it demands some sacrifice in spatial continuity.
-
-### `g2g` : grid to grid 
-
+### `g2g` : grid to grid
 When computation speed (and memory!) is not a constrain, one may process the model in 
 a _grid to grid_ (`g2g`) mode. This approach process the whole grid of the basin so the
 modeller has the freedom do provide detailed parameter maps.
 
 For instance, consider the hypothesis that the observed `NDVI` in a given basin may be a 
-good proxy for the heterogeneity of the canopy water stock capacity. In `g2g` mode
-all you need to do is provide the `NDVI` map as the spatial proxy paramater.
+good proxy for the heterogeneity of the canopy water stock capacity. While in `g2g` mode
+all you need to do is provide the full `NDVI` map as the spatial proxy paramater.
 
+The `g2g` approach is mostly appealing for small basins and scientific studies.
+
+---
 
 # recipes
 
 Included in the repo there is this `cookbook.py` file. you may check it for some neat examples.
 
-### `SAL` (sensitivity analysis) of the `m` parameter
+## `SAL` (sensitivity analysis) of `di` to the `m` parameter
 
 For instance, consider the `TOPMODEL` concepts of the local and global deficits and the `m` exponential decay parameter for baseflow discharge.
 
-Then ask yourself how the saturated areas would change if the `m` is different. 
+Then ask yourself how the saturated areas `VSA` would change if the `m` is different. 
 
 In other words: what is the sensitivity of local deficits and saturated areas to the `m` parameter?
 
@@ -204,13 +246,14 @@ Thus yielding a cool gif animation:
 
 ![sal_m](https://github.com/ipo-exe/planslab/blob/main/docs/animation_m.gif "sal")
 
+---
 
-### `SAL` (sensitivity analysis) of the `lambda` parameter
+## `SAL` (sensitivity analysis) of `di` to the `lambda` parameter
 
-In the `TOPMODEL`, `lambda` is defined as the average `TWI` value within the catchment basin. 
-But who cares about the standard definition? In the formula `lambda` really works as a threshold for mapping local deficits. 
-In `plans` it is relaxed as a regular model parameter. 
-And thus we can perform some more `SAL`:
+In the `TOPMODEL`, `lambda` is defined as the average `TWI` value within the catchment 
+basin. But who cares about the standard definition? In the formula `lambda` really
+works as a threshold for mapping local deficits. In `plans` it is relaxed as a regular
+model parameter. And thus we can perform some more `SAL`:
 
 ```python
 import inout
@@ -258,18 +301,21 @@ And then we got another cool gif animation:
 
 ![sal_lamb](https://github.com/ipo-exe/planslab/blob/main/docs/animation_lamb.gif "sal")
 
+---
 
-### `SAL` (sensitivity analysis) of the `TWI`
+## `SAL` (sensitivity analysis) of `di` to the `TWI` map
 
 `TWI` - the Topographic Wetness Index is among the core ideas behind the `TOPMODEL` approach. 
 It is a similarity index map for the propensity to saturation of a given element in the catchment.
 
 Again, there is the standard TWI formula derived from the assumptions made when `TOPMODEL` was developed.
+
 And again, we do not care much about the standard formulas. 
 What if the propensity to saturation if different? 
-This type of question opens the doors for many new hypothesis of how this propensity to saturation can be mapped.
+This type of question opens the doors for many new hypothesis of how this propensity to saturation 
+can be mapped.
 
-And we may perform some more `SAL` on this.
+As we mentined above, we provide the novel `HTWI` index map so we may perform some more `SAL` on this.
 
 ```python
  # import tool:
@@ -303,4 +349,223 @@ More cool gif animation:
 
 ![sal_twi](https://github.com/ipo-exe/planslab/blob/main/docs/animation_twi.gif "sal")
 
+---
 
+## `g2g` simulation
+
+`planslab` offers a standard simulation tool for the `g2g` mode.
+
+### playing with the model
+
+The model is a python function that requires some inputs parameters. 
+So if you want to play directly with the model you may need some
+help:
+
+```python
+from model import sim_g2g
+
+print(help(sim_g2g))
+```
+The output will be something like this:
+```markdown
+Help on function sim_g2g in module model:
+
+sim_g2g(series_df, basin, twi, qt0, cpmax, sfmax, roots, qo, m, lamb, ksat, n, k, scale=1000, trace=True, tracevars='D-Cpy', integrate=False, integratevars='D-Qv')
+    g2g simulation model
+    
+    Simulated variables:
+    
+    'D',    # saturated water stock deficit
+    'Unz',  # unsaturated zone water stock
+    'Sfs',  # surface water stock
+    'Cpy',  # canopy water stock
+    'VSA',  # variable source area
+    'Prec', # precipitation
+    'PET',  # potential evapotranspiration
+    'Intc', # interceptation in canopy
+    'Ints', # interceptation in surface
+    'TF',   # throughfall
+    'R',    # runoff
+    'RIE',  # infiltration excess runoff (Hortonian)
+    'RSE',  # saturation excess runoff (Dunnean)
+    'RC',   # runofff coeficient (%)
+    'Inf',  # infiltration
+    'Qv',   # recharge
+    'Evc',  # evaporation from the canopy
+    'Evs',  # evaporation from the surface
+    'Tpun', # transpiration from the unsaturated zone
+    'Tpgw', # transpiration from the saturated zone
+    'ET',   # evapotranspiration
+    'Qb',   # baseflow
+    'Qs',   # stormflow
+    'Q'     # streamflow
+    
+    :param series_df: pandas dataframe of timeseries
+    :param basin: 2d numpy array of basin area (pseudo-boolean)
+    :param twi: 2d numpy array of TWI map (positive values only)
+    :param qt0: float of initial condition of baseflow in mm/d
+    :param cpmax: float or 2d numpy array of canopy water stock capacity in mm
+    :param sfmax: float or 2d numpy array of surface water stock capacity in mm
+    :param roots: float or 2d numpy array of effective root zone depth in mm
+    :param qo: float of full saturation baseflow in mm/d
+    :param m: float of the scaling parameter in mm
+    :param lamb: float the TWI threshold
+    :param ksat: float or 2d numpy array of daily hydraulic conductivity in mm/d
+    :param n: float of number of linear reservoirs (n >= 1)
+    :param k: float of detention time of linear reservoirs (k >= 1)
+    :param scale: int value to scale maps to integer format (recommended scale >= 1000)
+    :param trace: boolean to trace back daily maps of variables
+    :param tracevars: string of variables to trace back. Variables must be concatenated by `-`.
+    Example: D-Cpy-VSA
+    :param integrate: boolean to integrate back maps of variables
+    :param integratevars: string of variables to integrate back. Variables must be concatenated by `-`.
+    Example: D-Cpy-VSA
+    :return: python dict containing:
+    
+    {'Series': simulated time series pandas dataframe,
+     'Trace': dict of 3d numpy arrays of traced variables,
+     'Integration': dict of 2d numpy arrays of integrated variables}
+```
+
+A very basic simulation run would look like this:
+```python
+import pandas as pd
+import matplotlib.pyplot as plt
+import inout
+from model import sim_g2g
+
+# inform series dataset file
+fseries = './data/series_short.txt'
+
+# inform TWI map file
+ftwi = './data/twi.asc'
+
+# inform basin map file
+fbasin = './data/basin.asc'
+
+# load serie to dataframe
+df = pd.read_csv(fseries, sep=';', parse_dates=['Date'])
+
+# load twi map
+meta, twi = inout.inp_asc_raster(file=ftwi, dtype='float32')
+# load basin map
+meta, basin = inout.inp_asc_raster(file=fbasin, dtype='float32')
+
+# define parameter values
+cpmax = 15
+sfmax = 30
+roots = 40
+qo = 10
+m = 8
+lamb = 7
+ksat = 3
+qt0 = qo / 100  # a fraction of qo - very dry condition
+k = 1.5
+n = 2
+
+# scale factor for maps
+scale = 1000
+
+# call model function
+sim = sim_g2g(series_df=df,
+              twi=twi,
+              basin=basin,
+              cpmax=cpmax,
+              sfmax=sfmax,
+              roots=roots,
+              qo=qo,
+              m=m,
+              lamb=lamb,
+              ksat=ksat,
+              qt0=qt0,
+              k=k,
+              n=n,
+              tracevars=False,  # no map traceback
+              integrate=False,  # no map integration
+              scale=scale)
+
+# plot some variables series:
+plt.plot(sim['Series']['Date'], sim['Series']['Prec'], 'lightgrey', label='Precipitation')
+plt.plot(sim['Series']['Date'], sim['Series']['Q'], 'black', label='Streamflow')
+plt.plot(sim['Series']['Date'], sim['Series']['Qb'], 'navy', label='Baseflow')
+plt.ylabel('mm/d')
+plt.legend()
+# 
+# show plot
+plt.show()
+```
+
+And then some output like this will show up:
+
+![plot01](https://github.com/ipo-exe/planslab/blob/main/docs/plot_01.PNG "plot01")
+
+### input data formats
+
+#### maps
+Maps are all in the `.asc` format. You may use the `gdal` `translate` tool in `QGIS` to convert `.tif` maps.
+In this case, do not forget to inform the nodata parameter as `-1`. Example of an `.asc` map heading:
+
+```markdown
+ncols        95
+nrows        77
+xllcorner    639958.57
+yllcorner    6699796.10
+cellsize     30.0
+NODATA_value  -1
+6.7 9.0 8.1 8.2 10.9 ...
+6.6 8.8 7.5 6.1 7.9 ...
+         ...
+6.8 8.3 7.9 6.6 7.4 ...
+7.3 8.0 6.9 8.0 7.2 ...
+```
+
+
+**Remenber: all maps must have same dimensions**! That is, the same number of rows and columns.
+
+#### time series
+Daily time series must be in `.txt` format. Fields must be separated by `;`.
+
+Mandatory fields:
+* `Date` - daily date in format `YYYY-MM-DD`;
+* `Prec` - daily precipitation in mm;
+* `PET` - daily potential evapotranspiration in mm.
+
+Optional fields:
+* `Temp` - daily average temperature in Celcius degrees;
+* `Qobs` - daily observed stream flow in mm;
+* `ETobs` - daily observed average (basin-wide) evapotranspiration in mm;
+* `IRI` - daily irrigation flow by inundation or dripping in mm;
+* `IRA` - daily irrigation flow by aspersion in mm.
+
+Example of a time series file heading:
+
+```markdown
+Date;        Prec;  Temp;  PET; Qobs
+2018-05-01; 0.375;  25.0; 4.08; 2.36
+2018-05-02;   0.0; 25.27; 4.10; 2.36
+2018-05-03; 0.325;  25.2; 4.07; 2.35
+2018-05-04;   0.0; 24.73; 3.99; 2.34
+ ... 
+```
+
+#### parameter dataframe
+
+Parameters can be provided by file. The file must be .txt and present the following dataframe 
+structure:
+
+```markdown
+Parameter;   Set;  Min;  Max
+        m;   5.0;  1.0;  50.0
+     lamb;   7.7;  1.0; 10.0
+       qo;  10.0;  1.0; 20.0
+    cpmax;  20.0;  5.0; 20.0
+    sfmax; 100.0;  5.0; 50.0
+    roots;  50.0; 10.0; 1500
+     ksat;   5.0;  1.0; 50.0
+        k;   1.0;  1.0;  5.0
+        n;   2.5;  1.1;  5.0
+ ... 
+```
+
+Where the `Set` field is taken for each parameter. `Mix` and `Max` fields are reserved for sensitivity
+analysis and uncertainty estimation.

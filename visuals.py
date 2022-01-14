@@ -215,8 +215,7 @@ def export_map_views(map3d, series, meta, ranges,
 
 
 def pannel_global(series_df,
-                  qobs=False,
-                  etobs=False,
+                  obs=False,
                   grid=True,
                   show=False,
                   folder='C:/bin',
@@ -242,9 +241,17 @@ def pannel_global(series_df,
     col2 = 10
     max_prec = 1.2 * np.max(series_df['Prec'].values)
     max_et = 1.5 * np.max(series_df['PET'].values)
-    max_irr = 1.5 * np.max((series_df['IRI'].values, series_df['IRA'].values))
     max_stocks = 1.2 * np.max((series_df['Unz'].values, series_df['Sfs'].values, series_df['Cpy'].values))
     max_int_flow = 1.2 * np.max((series_df['Inf'].values, series_df['Qv'].values))
+    if 'Qobs' in series_df.columns and obs:
+        qobs = True
+    else:
+        qobs = False
+    if 'Etobs' in series_df.columns and obs:
+        etobs = True
+    else:
+        etobs = False
+
     if qobs:
         qmin = 0.8 * np.min((series_df['Q'].values, series_df['Qobs'].values))
         qmax = 1.5 * np.max((series_df['Q'].values, series_df['Qobs'].values))
@@ -260,15 +267,17 @@ def pannel_global(series_df,
     plt.ylabel('mm/d (Prec)')
     plt.ylim(0, max_prec)
     plt.legend(loc='upper left', ncol=1, framealpha=1, fancybox=False)
-    if max_irr == 0:
-        pass
-    else:
-        ax2 = ax.twinx()
-        plt.plot(series_df['Date'], series_df['IRA'], 'orange', label='Irrigation by aspersion')
-        plt.plot(series_df['Date'], series_df['IRI'], 'green', label='Irrigation by inundation')
-        plt.ylabel('mm/d (IRA, IRI)')
-        plt.ylim(0, max_irr)
-        plt.legend(loc='upper right', ncol=2, framealpha=1, fancybox=False)
+    if 'IRA' in series_df.columns and 'IRI' in series_df.columns:
+        max_irr = np.max((series_df['IRA'].values, series_df['IRI'].values))
+        if max_irr == 0:
+            pass
+        else:
+            ax2 = ax.twinx()
+            plt.plot(series_df['Date'], series_df['IRA'], 'orange', label='Irrigation by aspersion')
+            plt.plot(series_df['Date'], series_df['IRI'], 'green', label='Irrigation by inundation')
+            plt.ylabel('mm/d (IRA, IRI)')
+            plt.ylim(0, max_irr)
+            plt.legend(loc='upper right', ncol=2, framealpha=1, fancybox=False)
     ax.tick_params(axis='x', which='major', labelsize=8)
     #
     # PET
@@ -283,11 +292,12 @@ def pannel_global(series_df,
     plt.ylabel('mm/d')
     plt.legend(loc='upper left', ncol=ncols, framealpha=1, fancybox=False)
     ax.tick_params(axis='x', which='major', labelsize=8)
-    ax2 = ax.twinx()
-    plt.plot(series_df['Date'], series_df['Temp'], 'tab:orange', label='Temperature')
-    plt.ylabel('°C')
-    plt.ylim(0, 1.3 * series_df['Temp'].max())
-    plt.legend(loc='upper right', ncol=1, framealpha=1, fancybox=False)
+    if 'Temp' in series_df.columns:
+        ax2 = ax.twinx()
+        plt.plot(series_df['Date'], series_df['Temp'], 'tab:orange', label='Temperature')
+        plt.ylabel('°C')
+        plt.ylim(0, 1.3 * series_df['Temp'].max())
+        plt.legend(loc='upper right', ncol=1, framealpha=1, fancybox=False)
     #
     # Runoff
     ax = fig.add_subplot(gs[1, 0:col1])

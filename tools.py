@@ -95,8 +95,6 @@ def slh_sim_g2g(fseries, ftwi, fbasin,
                         integratevars=integratevars,
                         scale=scale)
     sim_df = sim['Series']
-    sim_df['IRI'] = 0
-    sim_df['IRA'] = 0
     if tui:
         status('exporting series')
     sim_df.to_csv('{}/sim_series.txt'.format(folder), sep=';', index=False)

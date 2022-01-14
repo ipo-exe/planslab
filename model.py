@@ -92,12 +92,70 @@ def topmodel_vsai(di):
     return ((di == 0) * 1)
 
 
-def sim_g2g(series_df, basin, twi, qt0, cpmax, sfmax, roots, qo, m, lamb, ksat, n=2, k=1,
+def sim_g2g(series_df, basin, twi, qt0, cpmax, sfmax, roots, qo, m, lamb, ksat, n, k,
             scale=1000,
-            trace=True,
+            trace=False,
             tracevars='D-Cpy',
             integrate=False,
             integratevars='D-Qv'):
+    """
+
+    g2g simulation model
+
+    Simulated variables:
+
+    'D',    # saturated water stock deficit
+    'Unz',  # unsaturated zone water stock
+    'Sfs',  # surface water stock
+    'Cpy',  # canopy water stock
+    'VSA',  # variable source area
+    'Prec', # precipitation
+    'PET',  # potential evapotranspiration
+    'Intc', # interceptation in canopy
+    'Ints', # interceptation in surface
+    'TF',   # throughfall
+    'R',    # runoff
+    'RIE',  # infiltration excess runoff (Hortonian)
+    'RSE',  # saturation excess runoff (Dunnean)
+    'RC',   # runofff coeficient (%)
+    'Inf',  # infiltration
+    'Qv',   # recharge
+    'Evc',  # evaporation from the canopy
+    'Evs',  # evaporation from the surface
+    'Tpun', # transpiration from the unsaturated zone
+    'Tpgw', # transpiration from the saturated zone
+    'ET',   # evapotranspiration
+    'Qb',   # baseflow
+    'Qs',   # stormflow
+    'Q'     # streamflow
+
+    :param series_df: pandas dataframe of timeseries
+    :param basin: 2d numpy array of basin area (pseudo-boolean)
+    :param twi: 2d numpy array of TWI map (positive values only)
+    :param qt0: float of initial condition of baseflow in mm/d
+    :param cpmax: float or 2d numpy array of canopy water stock capacity in mm
+    :param sfmax: float or 2d numpy array of surface water stock capacity in mm
+    :param roots: float or 2d numpy array of effective root zone depth in mm
+    :param qo: float of full saturation baseflow in mm/d
+    :param m: float of the scaling parameter in mm
+    :param lamb: float the TWI threshold
+    :param ksat: float or 2d numpy array of daily hydraulic conductivity in mm/d
+    :param n: float of number of linear reservoirs (n >= 1)
+    :param k: float of detention time of linear reservoirs (k >= 1)
+    :param scale: int value to scale maps to integer format (recommended scale >= 1000)
+    :param trace: boolean to trace back daily maps of variables
+    :param tracevars: string of variables to trace back. Variables must be concatenated by `-`.
+    Example: D-Cpy-VSA
+    :param integrate: boolean to integrate back maps of variables
+    :param integratevars: string of variables to integrate back. Variables must be concatenated by `-`.
+    Example: D-Cpy-VSA
+    :return: python dict containing:
+
+    {'Series': simulated time series pandas dataframe,
+     'Trace': dict of 3d numpy arrays of traced variables,
+     'Integration': dict of 2d numpy arrays of integrated variables}
+
+    """
     from sys import getsizeof
     #import matplotlib.pyplot as plt
     # stock variables
@@ -281,7 +339,7 @@ def sim_g2g(series_df, basin, twi, qt0, cpmax, sfmax, roots, qo, m, lamb, ksat, 
         # ---- Recharge
 
         # Vadose zone saturation
-        unz_sat = mps['Unz'] / mps['D']
+        unz_sat = mps['Unz'] / (mps['D'] + (scale / 1000))
         unz_sat = np.nan_to_num(unz_sat, nan=0)
         unz_sat = (unz_sat * (unz_sat <= 1)) + (1 * (unz_sat > 1))
         #
@@ -295,7 +353,7 @@ def sim_g2g(series_df, basin, twi, qt0, cpmax, sfmax, roots, qo, m, lamb, ksat, 
         # ---- Transpiration from vadose zone
         #
         # transpiration factor for accounting root depth in the vadoze zone
-        tp_factor = ((roots * scale) / (mps['D']))
+        tp_factor = ((roots * scale) / (mps['D'] + (scale / 1000)))
         tp_factor = np.nan_to_num(tp_factor, nan=1, posinf=1) # avoid nan values where D is 0
         tp_factor = (tp_factor * (tp_factor < 1)) + (1 * (tp_factor >= 1))
         #
