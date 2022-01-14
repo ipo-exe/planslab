@@ -27,7 +27,7 @@ you do not need to worry about any of these libraries.
 6) upload all data files in the directory you just created;
 7) start writing your scripts.
 
-# basics
+# some basics
 
 ## the `TWI` 
 
