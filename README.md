@@ -523,16 +523,33 @@ tools.slh_sim_g2g(fseries='./data/series_short.txt',  # series file
                   fksat='none',  # no index map provided
                   pannel=True, # export simulation pannel
                   trace=True, # do traceback
-                  tracevars='VSA-D-R', # maps to traceback
+                  tracevars='VSA-D-R', # which maps to traceback
                   animate=True,  # animate maps in .gif file
                   integrate=True,  # do integrate some maps
-                  integratevars='D-Cpy-R',  # maps to integrate
+                  integratevars='D-Cpy-R',  # which maps to integrate
                   folder='/content/output', # output folder
                   wkpl=True, # consider output folder a workplace
                   tui=True  # print progress in the screen
                   ) 
 ```
 
+#### trace and animate
+
+`trace` means that all daily maps are going to be returned by the simulation. Note 
+that depending on the number of time steps and variables this may consume a large
+piece of computer memory and your machine might crash.
+
+But it is worth since the `animate` feature creates cool gifs like this, for runoff:
+
+![anim_r](https://github.com/ipo-exe/planslab/blob/main/docs/anim_r.gif "anim_r")
+
+#### integrate
+
+integrate is a less memory intensive feature. It accumulates flows and take stocks
+averages along the simulation run. The output images may inform you the spatial
+process dominance, like where runoff occurs more or less:
+
+![r_int](https://github.com/ipo-exe/planslab/blob/main/docs/R_integration.PNG "r_int")
 
 
 ### input data formats
