@@ -549,7 +549,7 @@ integrate is a less memory intensive feature. It accumulates flows and take stoc
 averages along the simulation run. The output images may inform you the spatial
 process dominance, like where runoff occurs more or less:
 
-![r_int](https://github.com/ipo-exe/planslab/blob/main/docs/R_integration.PNG "r_int")
+![r_int](https://github.com/ipo-exe/planslab/blob/main/docs/R_integration.png "r_int")
 
 
 ### input data formats
