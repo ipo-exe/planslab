@@ -1,7 +1,6 @@
 import inout
 import numpy as np
 import pandas as pd
-import matplotlib.pyplot as plt
 
 
 def slh_sim_g2g(fseries, ftwi, fbasin,
@@ -21,6 +20,33 @@ def slh_sim_g2g(fseries, ftwi, fbasin,
                 label='',
                 scale=1000,
                 tui=True):
+    """
+
+    Stable LULC Hydrology - g2g mode
+
+    :param fseries: string path to series .txt file
+    :param ftwi: string path to twi .asc file
+    :param fbasin: string path to basin .asc file
+    :param fparams: string path to parameters dataframe .txt file
+    :param fcpmax: string 'none' or path to cpmax .asc file
+    :param fsfmax: string 'none' or path to sfmax .asc file
+    :param froots: string 'none' or path to roots .asc file
+    :param fksat: string 'none' or path to ksat .asc file
+    :param pannel: boolean to export pannel file
+    :param trace: boolean to trace back daily maps of variables
+    :param tracevars: string of variables to trace back. Variables must be concatenated by `-`.
+    Example: D-Cpy-VSA
+    :param integrate: boolean to integrate back maps of variables
+    :param integratevars: string of variables to integrate back. Variables must be concatenated by `-`.
+    Example: D-Cpy-VSA
+    :param animate: boolean to create .gif animation of traced maps
+    :param folder: string path to output folder
+    :param wkpl: boolean to use folder as workplace
+    :param label: string label to output folder
+    :param scale: int value to scale maps to integer format (recommended scale >= 1000)
+    :param tui: boolean to screen printouts
+    :return:
+    """
     import model
     from backend import create_rundir, status
     from visuals import pannel_global

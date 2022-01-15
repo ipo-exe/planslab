@@ -499,6 +499,42 @@ And then some output like this will show up:
 
 ![plot01](https://github.com/ipo-exe/planslab/blob/main/docs/plot_01.PNG "plot01")
 
+
+### `ipo` g2g tool
+
+A standard Input-Process-Output (`ipo`) tool is available in the `tools.py` module.
+By using this function, all data must be provided by filepaths, including the 
+parameters. 
+
+_Note: the values in the parameter index maps are taken as multipliers for the `Set`
+value informed in the parameter file. If a parameter index map file is passed as
+`none`, the value considered is only that of the parameter file (constant value)_
+
+```python
+import tools
+
+tools.slh_sim_g2g(fseries='./data/series_short.txt',  # series file
+                  ftwi='./data/twi.asc',  # TWI map file
+                  fbasin='./data/basin.asc',  # basin map file
+                  fparams='./data/params.txt',  # parameter dataframe file
+                  fcpmax='./data/ndvi.asc',  # index map for cpmax
+                  fsfmax='./data/ndvi.asc', # index map for sfmax
+                  froots='./data/ndvi.asc', # index map for roots
+                  fksat='none',  # no index map provided
+                  pannel=True, # export simulation pannel
+                  trace=True, # do traceback
+                  tracevars='VSA-D-R', # maps to traceback
+                  animate=True,  # animate maps in .gif file
+                  integrate=True,  # do integrate some maps
+                  integratevars='D-Cpy-R',  # maps to integrate
+                  folder='/content/output', # output folder
+                  wkpl=True, # consider output folder a workplace
+                  tui=True  # print progress in the screen
+                  ) 
+```
+
+
+
 ### input data formats
 
 #### maps
@@ -564,7 +600,6 @@ Parameter;   Set;  Min;  Max
      ksat;   5.0;  1.0; 50.0
         k;   1.0;  1.0;  5.0
         n;   2.5;  1.1;  5.0
- ... 
 ```
 
 Where the `Set` field is taken for each parameter. `Mix` and `Max` fields are reserved for sensitivity
