@@ -111,8 +111,8 @@ def sim_g2g(series_df, basin, twi, qt0, cpmax, sfmax, roots, qo, m, lamb, ksat, 
     'VSA',  # variable source area
     'Prec', # precipitation
     'PET',  # potential evapotranspiration
-    'Intc', # interceptation in canopy
-    'Ints', # interceptation in surface
+    'Inc', # interceptation in canopy
+    'Ins', # interceptation in surface
     'TF',   # throughfall
     'R',    # runoff
     'RIE',  # infiltration excess runoff (Hortonian)
@@ -122,8 +122,8 @@ def sim_g2g(series_df, basin, twi, qt0, cpmax, sfmax, roots, qo, m, lamb, ksat, 
     'Qv',   # recharge
     'Evc',  # evaporation from the canopy
     'Evs',  # evaporation from the surface
-    'Tpun', # transpiration from the unsaturated zone
-    'Tpgw', # transpiration from the saturated zone
+    'Tpu', # transpiration from the unsaturated zone
+    'Tps', # transpiration from the saturated zone
     'ET',   # evapotranspiration
     'Qb',   # baseflow
     'Qs',   # stormflow
@@ -166,8 +166,8 @@ def sim_g2g(series_df, basin, twi, qt0, cpmax, sfmax, roots, qo, m, lamb, ksat, 
                'VSA',  # variable source area
                'Prec', # precipitation
                'PET',  # potential evapotranspiration
-               'Intc', # interceptation in canopy
-               'Ints', # interceptation in surface
+               'Inc', # interceptation in canopy
+               'Ins', # interceptation in surface
                'TF',   # throughfall
                'R',    # runoff
                'RIE',  # infiltration excess runoff (Hortonian)
@@ -177,8 +177,8 @@ def sim_g2g(series_df, basin, twi, qt0, cpmax, sfmax, roots, qo, m, lamb, ksat, 
                'Qv',   # recharge
                'Evc',  # evaporation from the canopy
                'Evs',  # evaporation from the surface
-               'Tpun', # transpiration from the unsaturated zone
-               'Tpgw', # transpiration from the saturated zone
+               'Tpu', # transpiration from the unsaturated zone
+               'Tps', # transpiration from the saturated zone
                'ET',   # evapotranspiration
                'Qb',   # baseflow
                'Qs',   # stormflow
@@ -239,19 +239,19 @@ def sim_g2g(series_df, basin, twi, qt0, cpmax, sfmax, roots, qo, m, lamb, ksat, 
         # STOCKS WATER BALANCE (backward looking)
         if t > 0:
             # Canopy water balance
-            mps['Cpy'] = mps['Cpy'] + mps['Intc'] - mps['Evc']
+            mps['Cpy'] = mps['Cpy'] + mps['Inc'] - mps['Evc']
             ts['Cpy'].values[t] = avg_2d(var2d=mps['Cpy'], weight=basin) / scale  # compute basin-wide avg
             #
             # Vadose zone water balance
-            mps['Unz'] = mps['Unz'] + mps['Inf'] - mps['Qv'] - mps['Tpun']
+            mps['Unz'] = mps['Unz'] + mps['Inf'] - mps['Qv'] - mps['Tpu']
             ts['Unz'].values[t] = avg_2d(var2d=mps['Unz'], weight=basin) / scale  # compute basin-wide avg
             #
             # Surface water balance
-            mps['Sfs'] = mps['Sfs'] + mps['Ints'] - mps['Inf'] - mps['Evs']
+            mps['Sfs'] = mps['Sfs'] + mps['Ins'] - mps['Inf'] - mps['Evs']
             ts['Sfs'].values[t] = avg_2d(var2d=mps['Sfs'], weight=basin) / scale  # compute basin-wide avg
             #
             # Deficit water balance
-            ts['D'].values[t] = ts['D'].values[t - 1] + ts['Qb'].values[t - 1] + ts['Tpgw'].values[t - 1] - \
+            ts['D'].values[t] = ts['D'].values[t - 1] + ts['Qb'].values[t - 1] + ts['Tps'].values[t - 1] - \
                                 ts['Qv'].values[t - 1]
             # update Deficit
             mps['D'] = scale * topmodel_di(d=ts['D'].values[t], twi=twi, m=m, lamb=lamb)
@@ -267,8 +267,8 @@ def sim_g2g(series_df, basin, twi, qt0, cpmax, sfmax, roots, qo, m, lamb, ksat, 
         p_intc = (scale * cpmax) - mps['Cpy']
         #
         # Interceptation in the canopy
-        mps['Intc'] = (p_intc * (mps['Prec'] > p_intc)) + (mps['Prec'] * (mps['Prec'] <= p_intc))
-        ts['Intc'].values[t] = avg_2d(var2d=mps['Intc'], weight=basin) / scale  # compute basin-wide avg
+        mps['Inc'] = (p_intc * (mps['Prec'] > p_intc)) + (mps['Prec'] * (mps['Prec'] <= p_intc))
+        ts['Inc'].values[t] = avg_2d(var2d=mps['Inc'], weight=basin) / scale  # compute basin-wide avg
         #
         # Evaporation in the canopy
         mps['Evc'] = (mps['PET'] * (mps['Cpy'] > mps['PET'])) + (mps['Cpy'] * (mps['Cpy'] <= mps['PET']))
@@ -278,7 +278,7 @@ def sim_g2g(series_df, basin, twi, qt0, cpmax, sfmax, roots, qo, m, lamb, ksat, 
         mps['PET'] = mps['PET'] - np.mean(mps['Evc'])
         #
         # Throughfall
-        mps['TF'] = mps['Prec'] - mps['Intc']
+        mps['TF'] = mps['Prec'] - mps['Inc']
         ts['TF'].values[t] = avg_2d(var2d=mps['TF'], weight=basin) / scale  # compute basin-wide avg
 
 
@@ -289,11 +289,11 @@ def sim_g2g(series_df, basin, twi, qt0, cpmax, sfmax, roots, qo, m, lamb, ksat, 
         p_tpgw = p_tpgw * (p_tpgw >= 0) # remove negative values
         #
         # Transpiration from groundwater
-        mps['Tpgw'] = (mps['PET'] * (p_tpgw > mps['PET'])) + (p_tpgw * (p_tpgw <= mps['PET']))
-        ts['Tpgw'].values[t] = avg_2d(var2d=mps['Tpgw'], weight=basin) / scale  # compute basin-wide avg
+        mps['Tps'] = (mps['PET'] * (p_tpgw > mps['PET'])) + (p_tpgw * (p_tpgw <= mps['PET']))
+        ts['Tps'].values[t] = avg_2d(var2d=mps['Tps'], weight=basin) / scale  # compute basin-wide avg
         #
         # update PET
-        mps['PET'] = mps['PET'] - np.mean(mps['Tpgw'])
+        mps['PET'] = mps['PET'] - np.mean(mps['Tps'])
 
         # ---- Interceptation on the surface
 
@@ -301,13 +301,13 @@ def sim_g2g(series_df, basin, twi, qt0, cpmax, sfmax, roots, qo, m, lamb, ksat, 
         p_ints = (sfmax * scale) - mps['Sfs']
         #
         # Interceptation on the surface
-        mps['Ints'] = (p_ints * (mps['TF'] > p_ints)) + (mps['TF'] * (mps['TF'] <= p_ints))
-        ts['Ints'].values[t] = avg_2d(var2d=mps['Ints'], weight=basin) / scale  # compute basin-wide avg
+        mps['Ins'] = (p_ints * (mps['TF'] > p_ints)) + (mps['TF'] * (mps['TF'] <= p_ints))
+        ts['Ins'].values[t] = avg_2d(var2d=mps['Ins'], weight=basin) / scale  # compute basin-wide avg
 
         # ---- Runoff
 
         # Runoff
-        mps['R'] = mps['TF'] - mps['Ints']
+        mps['R'] = mps['TF'] - mps['Ins']
         ts['R'].values[t] = avg_2d(var2d=mps['R'], weight=basin) / scale  # compute basin-wide avg
         #
         # Runoff component -  RIE
@@ -362,11 +362,11 @@ def sim_g2g(series_df, basin, twi, qt0, cpmax, sfmax, roots, qo, m, lamb, ksat, 
         p_tpun = (p_tpun_1 * ((roots * scale) > mps['D'])) + (p_tpun_1 * tp_factor * ((roots * scale) <= mps['D']))
         #
         # Transpiration from vadose zone
-        mps['Tpun'] = (mps['PET'] * (p_tpun > mps['PET'])) + (p_tpun * (p_tpun <= mps['PET']))
-        ts['Tpun'].values[t] = avg_2d(var2d=mps['Tpun'], weight=basin) / scale  # compute basin-wide avg
+        mps['Tpu'] = (mps['PET'] * (p_tpun > mps['PET'])) + (p_tpun * (p_tpun <= mps['PET']))
+        ts['Tpu'].values[t] = avg_2d(var2d=mps['Tpu'], weight=basin) / scale  # compute basin-wide avg
         #
         # update PET
-        mps['PET'] = mps['PET'] - np.mean(mps['Tpun'])
+        mps['PET'] = mps['PET'] - np.mean(mps['Tpu'])
 
         # Evaporation from the surface
         # potential Evs
@@ -379,7 +379,7 @@ def sim_g2g(series_df, basin, twi, qt0, cpmax, sfmax, roots, qo, m, lamb, ksat, 
         ts['Qb'].values[t] = topmodel_qb(d=ts['D'].values[t], qo=qo, m=m)
 
         # --- ET
-        mps['ET'] = mps['Evc'] + mps['Evs'] + mps['Tpgw'] + mps['Tpun']
+        mps['ET'] = mps['Evc'] + mps['Evs'] + mps['Tps'] + mps['Tpu']
         ts['ET'].values[t] = avg_2d(var2d=mps['ET'], weight=basin) / scale  # compute basin-wide avg
         #
         # append to trace and integration

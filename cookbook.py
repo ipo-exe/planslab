@@ -1,4 +1,6 @@
 
+
+
 def demo_sal_m():
     # import tool:
     from tools import sal_d_by_m
@@ -22,6 +24,7 @@ def demo_sal_m():
                label='lab',
                wkpl=True,
                folder=_outfolder)
+
 
 def demo_sal_lamb():
     import inout
@@ -145,6 +148,10 @@ def demo_g2g_model():
                   tracevars=False,  # no map traceback
                   integrate=False,  # no map integration
                   scale=scale)
+
+    # view dataframe
+    print(sim['Series'].head(15).to_string())
+
 
     # plot some variables series:
     plt.plot(sim['Series']['Date'], sim['Series']['Prec'], 'lightgrey', label='Precipitation')

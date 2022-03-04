@@ -24,6 +24,33 @@ def slh_sim_g2g(fseries, ftwi, fbasin,
 
     Stable LULC Hydrology - g2g mode
 
+    Simulated variables:
+
+    'D',    # saturated water stock deficit
+    'Unz',  # unsaturated zone water stock
+    'Sfs',  # surface water stock
+    'Cpy',  # canopy water stock
+    'VSA',  # variable source area
+    'Prec', # precipitation
+    'PET',  # potential evapotranspiration
+    'Inc', # interceptation in canopy
+    'Ins', # interceptation in surface
+    'TF',   # throughfall
+    'R',    # runoff
+    'RIE',  # infiltration excess runoff (Hortonian)
+    'RSE',  # saturation excess runoff (Dunnean)
+    'RC',   # runofff coeficient (%)
+    'Inf',  # infiltration
+    'Qv',   # recharge
+    'Evc',  # evaporation from the canopy
+    'Evs',  # evaporation from the surface
+    'Tpu', # transpiration from the unsaturated zone
+    'Tps', # transpiration from the saturated zone
+    'ET',   # evapotranspiration
+    'Qb',   # baseflow
+    'Qs',   # stormflow
+    'Q'     # streamflow
+
     :param fseries: string path to series .txt file
     :param ftwi: string path to twi .asc file
     :param fbasin: string path to basin .asc file
@@ -148,7 +175,7 @@ def slh_sim_g2g(fseries, ftwi, fbasin,
                 mapid = 'VSA'
             elif v == 'D':
                 mapid = 'deficit'
-            elif v in ['Evc', 'Evs', 'Tpun', 'Tpgw', 'ET']:
+            elif v in ['Evc', 'Evs', 'Tpu', 'Tps', 'ET']:
                 mapid = 'flow_v'
             else:
                 mapid = 'flow'
@@ -204,7 +231,7 @@ def slh_sim_g2g(fseries, ftwi, fbasin,
                 mapid = 'flow_v'
             else:
                 mapid = 'flow'
-            # get ranges
+            # get ranges and scale
             if v == 'VSA':
                 ranges = (0, 100)
                 v_scale = 1 / 100
@@ -217,6 +244,8 @@ def slh_sim_g2g(fseries, ftwi, fbasin,
             kind = 'accumulation'
             if v in ['D', 'Cpy', 'Sfs', 'Unz', 'VSA', 'RC']:
                 kind = 'average'
+
+            # plot view
             plot_map_view(map2d=sim['Integration'][v] / v_scale,
                           ranges=ranges,
                           meta=meta,
