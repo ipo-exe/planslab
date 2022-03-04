@@ -244,7 +244,11 @@ def slh_sim_g2g(fseries, ftwi, fbasin,
             kind = 'accumulation'
             if v in ['D', 'Cpy', 'Sfs', 'Unz', 'VSA', 'RC']:
                 kind = 'average'
-
+            # export map
+            inout.out_asc_raster(array=sim['Integration'][v] / v_scale,
+                                 meta=meta,
+                                 folder=integrate_folder,
+                                 filename='{}_integration'.format(v))
             # plot view
             plot_map_view(map2d=sim['Integration'][v] / v_scale,
                           ranges=ranges,
