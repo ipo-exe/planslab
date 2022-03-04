@@ -369,8 +369,8 @@ def pannel_global(series_df,
     ax = fig.add_subplot(gs[3, col2:])
     plt.grid(grid)
     plt.plot(series_df['Date'], series_df['PET'], 'tab:grey', label='PET')
-    plt.plot(series_df['Date'], series_df['Tpun'], 'yellowgreen', label='Transp. vadose')
-    plt.plot(series_df['Date'], series_df['Tpgw'], 'darkgreen', label='Transp. groundwater')
+    plt.plot(series_df['Date'], series_df['Tpu'], 'yellowgreen', label='Transp. vadose')
+    plt.plot(series_df['Date'], series_df['Tps'], 'darkgreen', label='Transp. groundwater')
     ncols = 3
     if etobs:
         ncols = ncols + 1
