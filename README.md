@@ -105,15 +105,14 @@ threshold depth within the vadose and saturated water stocks.
 
 The global structure of `plans` (similar of `TOPMODEL`):
 
-![gbl](https://github.com/ipo-exe/planslab/blob/main/docs/model_global.PNG "gbl")
+![gbl](https://github.com/ipo-exe/planslab/blob/main/docs/model_global.png "gbl")
 
 The local structure of `plans` includes some extra parameters:
 * `cpmax`: canopy water stock capacity, in mm;
 * `sfmax`: surface water stock capacity, in mm, and;
 * `erz` (or simply `roots`): effective root zone depth, in mm.
 
-![lcl](https://github.com/ipo-exe/planslab/blob/main/docs/model_local.PNG "lcl")
-
+![lcl](https://github.com/ipo-exe/planslab/blob/main/docs/model_local.png "lcl")
 
 
 ## recharge `Qv`
