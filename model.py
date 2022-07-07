@@ -203,7 +203,7 @@ def topmodel_vsai(di):
     return ((di == 0) * 1)
 
 
-def simulation(series_df, basin, twi, qt0, cpmax, sfmax, roots, qo, m, lamb, ksat, rho, c, n, k,
+def simulation(series_df, basin, htwi, qt0, cpmax, sfmax, roots, qo, m, lamb, ksat, rho, c, n, k,
                scale=1000,
                lat=-30,
                trace=False,
@@ -243,7 +243,7 @@ def simulation(series_df, basin, twi, qt0, cpmax, sfmax, roots, qo, m, lamb, ksa
 
     :param series_df: pandas dataframe of timeseries
     :param basin: 2d numpy array of basin area
-    :param twi: numpy array of TWI map (positive values only)
+    :param htwi: numpy array of HTWI map (positive values only)
     :param qt0: float of initial condition of baseflow in mm/d
     :param cpmax: float or 2d numpy array of canopy water stock capacity in mm
     :param sfmax: float or 2d numpy array of surface water stock capacity in mm
@@ -277,8 +277,7 @@ def simulation(series_df, basin, twi, qt0, cpmax, sfmax, roots, qo, m, lamb, ksa
                'Sf',  # surface water stock
                'Cp',  # canopy water stock
                'VSA', # variable source area
-               'P',   # precipitation
-               'T',   # temperature
+               'P',   # precipitation [input]
                'PET', # potential evapotranspiration
                'IRI', # irrigation dripping or inundation
                'IRA', # irrigation by aspersion
@@ -336,7 +335,7 @@ def simulation(series_df, basin, twi, qt0, cpmax, sfmax, roots, qo, m, lamb, ksa
             # store as uint16 (unsigned 16-bit integer)
             mps[v] = np.zeros(shape=shape, dtype='uint16')
             mem_size = getsizeof(mps[v]) + mem_size
-    #print('Sim size : {} MB'.format(mem_size / 1000000))
+    print('Sim size : {} MB'.format(mem_size / 1000000))
 
     # deploy trace and integration maps
     mps_trace = dict()
@@ -347,7 +346,7 @@ def simulation(series_df, basin, twi, qt0, cpmax, sfmax, roots, qo, m, lamb, ksa
             # store as uint16 (unsigned 16-bit integer)
             mps_trace[v] = np.zeros(shape=(tlen, rows, cols), dtype='uint16')
             mem_size = getsizeof(mps_trace[v]) + mem_size
-    print('Trace size : {} MB'.format(mem_size / 1000000))
+        print('Trace size : {} MB'.format(mem_size / 1000000))
     mps_integrate = dict()
     if integrate:
         integratevars = integratevars.split('-')
@@ -359,7 +358,7 @@ def simulation(series_df, basin, twi, qt0, cpmax, sfmax, roots, qo, m, lamb, ksa
     df_ts['D'].values[0] = topmodel_d0(qt0=qt0, qo=qo, m=m)
 
     # todo adapt to twi vector
-    mps['D'] = scale * topmodel_di(d=df_ts['D'].values[0], twi=twi, m=m, lamb=lamb)
+    mps['D'] = scale * topmodel_di(d=df_ts['D'].values[0], twi=htwi, m=m, lamb=lamb)
     mps['VSA'] = topmodel_vsai(di=mps['D'])
 
     # get root zone depth:
@@ -390,7 +389,7 @@ def simulation(series_df, basin, twi, qt0, cpmax, sfmax, roots, qo, m, lamb, ksa
                                 df_ts['Qv'].values[t - 1]
             # update Deficit
             # todo adapt to twi vector
-            mps['D'] = scale * topmodel_di(d=df_ts['D'].values[t], twi=twi, m=m, lamb=lamb)
+            mps['D'] = scale * topmodel_di(d=df_ts['D'].values[t], twi=htwi, m=m, lamb=lamb)
             # update VSA
             mps['VSA'] = topmodel_vsai(di=mps['D'])
             df_ts['VSA'].values[t] = 100 * avg_2d(var2d=mps['VSA'], weight=basin) / scale  # compute basin-wide avg

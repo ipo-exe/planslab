@@ -132,7 +132,7 @@ def slh_sim_g2g(fseries, ftwi, fbasin,
     if tui:
         status('running model')
     sim = model.simulation(series_df=df_series,
-                           twi=twi,
+                           htwi=twi,
                            basin=basin,
                            cpmax=cpmax,
                            sfmax=sfmax,

@@ -95,52 +95,67 @@ def demo_sal_twi():
 def demo_g2g_model():
     import pandas as pd
     import matplotlib.pyplot as plt
-    import inp
+    import inp, geo
     from model import simulation
 
     # inform series dataset file
-    fseries = './data/series_short.txt'
+    fseries = './samples/series_obs.txt'
 
     # inform TWI map file
-    ftwi = './data/twi.asc'
+    ftwi = './samples/map_twi.asc'
+
+    # inform HAND map file
+    fhand = './samples/map_hand.asc'
 
     # inform basin map file
-    fbasin = './data/basin.asc'
-
+    fbasin = './samples/map_basin.asc'
 
     # load serie to dataframe
     df = pd.read_csv(fseries, sep=';', parse_dates=['Date'])
+    # filter
+    df = df.query('Date >= "2017-01-01"')
 
     # load twi map
     meta, twi = inp.asc_raster(file=ftwi, dtype='float32')
+
+    # load hand map
+    meta, hand = inp.asc_raster(file=fhand, dtype='float32')
+
     # load basin map
     meta, basin = inp.asc_raster(file=fbasin, dtype='float32')
 
     # define parameter values
-    cpmax = 15
-    sfmax = 30
-    roots = 40
-    qo = 15
+    hmax = 5
+    w = 0.3
+    cpmax = 20
+    sfmax = 20
+    roots = 20
+    qo = 10
     m = 10
-    lamb = 7
-    ksat = 4
-    rho = 0.05
-    c = 90
-    k = 1.5
-    n = 2
+    lamb = 10
+    ksat = 20
+    rho = 0.2
+    c = 80
+    k = 2
+    n = 1
 
     # inital conditions
     qt0 = qo / 100  # a fraction of qo - very dry condition
 
     # boundary conditions:
-    lat = -30
+    lat = -10
 
     # scale factor for maps
     scale = 1000
 
+    # compute HTWI
+    htwi = geo.htwi(twi=twi, hand=hand, h_max=hmax, h_w=w)
+    #plt.imshow(htwi)
+    #plt.show()
+
     # call model function
     sim = simulation(series_df=df,
-                     twi=twi,
+                     htwi=htwi,
                      basin=basin,
                      cpmax=cpmax,
                      sfmax=sfmax,
@@ -155,23 +170,23 @@ def demo_g2g_model():
                      k=k,
                      n=n,
                      lat=lat,
-                     trace=True, # map traceback
+                     trace=False,  # map traceback
                      tracevars='D-Qv',
-                     integrate=False,  # map integration
-                     integratevars='R',
-
+                     integrate=True,  # map integration
+                     integratevars='D-RC-VSA',
                      scale=scale)
 
     # view dataframe
     print(sim['Series'].head(15).to_string())
-
-    print(sim['Trace']['D'][10].dtype)
-
-    plt.imshow(sim['Trace']['D'][10] / scale)
+    print(sim['Series']['Tp'].sum())
+    print(sim['Integration']['D'].dtype)
+    plt.imshow(sim['Integration']['RC'])
     plt.show()
 
     # plot some variables series:
-    plt.plot(sim['Series']['Date'], sim['Series']['PET'], 'lightgrey', label='PET')
+    plt.plot(sim['Series']['Date'], sim['Series']['P'], 'lightgrey', label='P')
+    plt.plot(sim['Series']['Date'], sim['Series']['Q_obs'], 'tab:red', label='Qobs')
+    #plt.plot(sim['Series']['Date'], sim['Series']['Ev'], 'red', label='Evap.')
     plt.plot(sim['Series']['Date'], sim['Series']['Tp'], 'green', label='Transp.')
     plt.plot(sim['Series']['Date'], sim['Series']['Q'], 'black', label='Streamflow')
     plt.plot(sim['Series']['Date'], sim['Series']['Qb'], 'navy', label='Baseflow')

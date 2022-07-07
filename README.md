@@ -468,7 +468,7 @@ scale = 1000
 
 # call model function
 sim = simulation(series_df=df,
-                 twi=twi,
+                 htwi=twi,
                  basin=basin,
                  cpmax=cpmax,
                  sfmax=sfmax,
