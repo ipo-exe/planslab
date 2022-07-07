@@ -27,7 +27,7 @@ def demo_sal_m():
 
 
 def demo_sal_lamb():
-    import inout
+    import inp
     import numpy as np
 
     # import tool:
@@ -44,9 +44,9 @@ def demo_sal_lamb():
 
     # compute the standard lambda
     # load twi map
-    meta, twi = inout.inp_asc_raster(file=_ftwi, dtype='float32')
+    meta, twi = inp.asc_raster(file=_ftwi, dtype='float32')
     # load basin map
-    meta, basin = inout.inp_asc_raster(file=_fbasin, dtype='float32')
+    meta, basin = inp.asc_raster(file=_fbasin, dtype='float32')
     # standard lambda:
     lamb_mean = np.sum(twi * basin) / np.sum(basin)
     lamb_1 = lamb_mean
@@ -95,8 +95,8 @@ def demo_sal_twi():
 def demo_g2g_model():
     import pandas as pd
     import matplotlib.pyplot as plt
-    import inout
-    from model import sim_g2g
+    import inp
+    from model import simulation
 
     # inform series dataset file
     fseries = './data/series_short.txt'
@@ -112,54 +112,74 @@ def demo_g2g_model():
     df = pd.read_csv(fseries, sep=';', parse_dates=['Date'])
 
     # load twi map
-    meta, twi = inout.inp_asc_raster(file=ftwi, dtype='float32')
+    meta, twi = inp.asc_raster(file=ftwi, dtype='float32')
     # load basin map
-    meta, basin = inout.inp_asc_raster(file=fbasin, dtype='float32')
+    meta, basin = inp.asc_raster(file=fbasin, dtype='float32')
 
     # define parameter values
     cpmax = 15
     sfmax = 30
     roots = 40
-    qo = 10
-    m = 8
+    qo = 15
+    m = 10
     lamb = 7
-    ksat = 3
-    qt0 = qo / 100  # a fraction of qo - very dry condition
+    ksat = 4
+    rho = 0.05
+    c = 90
     k = 1.5
     n = 2
+
+    # inital conditions
+    qt0 = qo / 100  # a fraction of qo - very dry condition
+
+    # boundary conditions:
+    lat = -30
 
     # scale factor for maps
     scale = 1000
 
     # call model function
-    sim = sim_g2g(series_df=df,
-                  twi=twi,
-                  basin=basin,
-                  cpmax=cpmax,
-                  sfmax=sfmax,
-                  roots=roots,
-                  qo=qo,
-                  m=m,
-                  lamb=lamb,
-                  ksat=ksat,
-                  qt0=qt0,
-                  k=k,
-                  n=n,
-                  tracevars=False,  # no map traceback
-                  integrate=False,  # no map integration
-                  scale=scale)
+    sim = simulation(series_df=df,
+                     twi=twi,
+                     basin=basin,
+                     cpmax=cpmax,
+                     sfmax=sfmax,
+                     roots=roots,
+                     qo=qo,
+                     m=m,
+                     lamb=lamb,
+                     ksat=ksat,
+                     rho=rho,
+                     qt0=qt0,
+                     c=c,
+                     k=k,
+                     n=n,
+                     lat=lat,
+                     trace=True, # map traceback
+                     tracevars='D-Qv',
+                     integrate=False,  # map integration
+                     integratevars='R',
+
+                     scale=scale)
 
     # view dataframe
     print(sim['Series'].head(15).to_string())
 
+    print(sim['Trace']['D'][10].dtype)
+
+    plt.imshow(sim['Trace']['D'][10] / scale)
+    plt.show()
 
     # plot some variables series:
-    plt.plot(sim['Series']['Date'], sim['Series']['Prec'], 'lightgrey', label='Precipitation')
+    plt.plot(sim['Series']['Date'], sim['Series']['PET'], 'lightgrey', label='PET')
+    plt.plot(sim['Series']['Date'], sim['Series']['Tp'], 'green', label='Transp.')
     plt.plot(sim['Series']['Date'], sim['Series']['Q'], 'black', label='Streamflow')
     plt.plot(sim['Series']['Date'], sim['Series']['Qb'], 'navy', label='Baseflow')
     plt.ylabel('mm/d')
     plt.legend()
     # show plot
     plt.show()
+
+
 
 demo_g2g_model()

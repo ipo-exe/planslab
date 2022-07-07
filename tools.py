@@ -1,4 +1,4 @@
-import inout
+import inp
 import numpy as np
 import pandas as pd
 
@@ -87,66 +87,71 @@ def slh_sim_g2g(fseries, ftwi, fbasin,
     # import data
     if tui:
         status('importing time series')
-    df = pd.read_csv(fseries, sep=';', parse_dates=['Date'])
+    df_series = pd.read_csv(fseries, sep=';', parse_dates=['Date'])
     if tui:
         status('importing twi map')
-    meta, twi = inout.inp_asc_raster(file=ftwi, dtype='float32')
+    meta, twi = inp.asc_raster(file=ftwi, dtype='float32')
     if tui:
         status('importing basin map')
-    meta, basin = inout.inp_asc_raster(file=fbasin, dtype='float32')
+    meta, basin = inp.asc_raster(file=fbasin, dtype='float32')
     if tui:
         status('importing parameters')
-    param_dct, param_df = inout.inp_hydroparams(fhydroparam=fparams)
+    param_dct, param_df = inp.hydroparams(fhydroparam=fparams)
     cpmax = param_dct['cpmax']['Set']
     sfmax = param_dct['sfmax']['Set']
     roots = param_dct['roots']['Set']
     qo = param_dct['qo']['Set']
     m = param_dct['m']['Set']
-    lamb = param_dct['lamb']['Set']
+    lamb = param_dct['lambda']['Set']
     ksat = param_dct['ksat']['Set']
-    qt0 = param_dct['qo']['Set'] / 100
+    rho = param_dct['rho']['Set']
+    c = param_dct['c']['Set']
     k = param_dct['k']['Set']
     n = param_dct['n']['Set']
+    qt0 = param_dct['qo']['Set'] / 100
     if fcpmax != 'none':
         if tui:
             status('importing canopy index map')
-        meta, cpmax_map = inout.inp_asc_raster(file=fcpmax, dtype='float32')
+        meta, cpmax_map = inp.asc_raster(file=fcpmax, dtype='float32')
         cpmax = cpmax_map * cpmax
     if fsfmax != 'none':
         if tui:
             status('importing surface index map')
-        meta, sfmax_map = inout.inp_asc_raster(file=fsfmax, dtype='float32')
+        meta, sfmax_map = inp.asc_raster(file=fsfmax, dtype='float32')
         sfmax = sfmax_map * sfmax
     if froots != 'none':
         if tui:
             status('importing roots index map')
-        meta, roots_map = inout.inp_asc_raster(file=froots, dtype='float32')
+        meta, roots_map = inp.asc_raster(file=froots, dtype='float32')
         roots = roots_map * roots
     if fksat != 'none':
         if tui:
             status('importing ksat index map')
-        meta, ksat_map = inout.inp_asc_raster(file=fksat, dtype='float32')
+        meta, ksat_map = inp.asc_raster(file=fksat, dtype='float32')
         ksat = ksat_map * ksat
     if tui:
         status('running model')
-    sim = model.sim_g2g(series_df=df,
-                        twi=twi,
-                        basin=basin,
-                        cpmax=cpmax,
-                        sfmax=sfmax,
-                        roots=roots,
-                        qo=qo,
-                        m=m,
-                        lamb=lamb,
-                        ksat=ksat,
-                        qt0=qt0,
-                        k=k,
-                        n=n,
-                        tracevars=tracevars,
-                        trace=trace,
-                        integrate=integrate,
-                        integratevars=integratevars,
-                        scale=scale)
+    sim = model.simulation(series_df=df_series,
+                           twi=twi,
+                           basin=basin,
+                           cpmax=cpmax,
+                           sfmax=sfmax,
+                           roots=roots,
+                           qo=qo,
+                           m=m,
+                           lamb=lamb,
+                           ksat=ksat,
+                           rho=rho,
+                           c=c,
+                           k=k,
+                           n=n,
+                           qt0=qt0,
+                           lat=-20,
+                           tracevars=tracevars,
+                           trace=trace,
+                           integrate=integrate,
+                           integratevars=integratevars,
+                           scale=scale)
     sim_df = sim['Series']
     if tui:
         status('exporting series')
@@ -245,7 +250,7 @@ def slh_sim_g2g(fseries, ftwi, fbasin,
             if v in ['D', 'Cpy', 'Sfs', 'Unz', 'VSA', 'RC']:
                 kind = 'average'
             # export map
-            inout.out_asc_raster(array=sim['Integration'][v] / v_scale,
+            inp.out_asc_raster(array=sim['Integration'][v] / v_scale,
                                  meta=meta,
                                  folder=integrate_folder,
                                  filename='{}_integration'.format(v))
@@ -255,7 +260,7 @@ def slh_sim_g2g(fseries, ftwi, fbasin,
                           meta=meta,
                           metadata=True,
                           mapid=mapid,
-                          mapttl='{} {} in {} days'.format(v, kind, str(int(len(df)))),
+                          mapttl='{} {} in {} days'.format(v, kind, str(int(len(df_series)))),
                           filename='{}_integration'.format(v),
                           folder=integrate_folder,
                           integration=True)
@@ -304,12 +309,12 @@ def sal_d_by_m(ftwi,
             label = label + '_'
         folder = create_rundir(label=label + 'SAL_D_by_m__{}_{}'.format(str(int(m1)), str(int(m2))), wkplc=folder)
     # load twi map
-    meta, twi = inout.inp_asc_raster(file=ftwi, dtype='float32')
+    meta, twi = inp.asc_raster(file=ftwi, dtype='float32')
     # load basin map
     if fbasin == 'none':
         basin = (twi.copy() * 0) + 1
     else:
-        meta, basin = inout.inp_asc_raster(file=fbasin, dtype='float32')
+        meta, basin = inp.asc_raster(file=fbasin, dtype='float32')
     # standard lambda:
     lamb_mean = np.sum(twi * basin) / np.sum(basin)
     d = np.linspace(0, dmax, size)
@@ -392,7 +397,7 @@ def sal_d_by_lamb(ftwi,
             label = label + '_'
         folder = create_rundir(label=label + 'SAL_D_by_lamb__{}_{}'.format(str(int(lamb1)), str(int(lamb2))), wkplc=folder)
     # load twi maps
-    meta, twi = inout.inp_asc_raster(file=ftwi, dtype='float32')
+    meta, twi = inp.asc_raster(file=ftwi, dtype='float32')
     d = np.linspace(0, dmax, size)
     for i in range(len(d)):
         lcl_d = d[i]
@@ -472,13 +477,13 @@ def sal_d_by_twi(ftwi1, ftwi2,
         folder = create_rundir(label=label + 'SAL_D_by_TWI', wkplc=folder)
 
     # load twi maps
-    meta, twi1 = inout.inp_asc_raster(file=ftwi1, dtype='float32')
-    meta, twi2 = inout.inp_asc_raster(file=ftwi2, dtype='float32')
+    meta, twi1 = inp.asc_raster(file=ftwi1, dtype='float32')
+    meta, twi2 = inp.asc_raster(file=ftwi2, dtype='float32')
     # load basin map
     if fbasin == 'none':
         basin = (twi1.copy() * 0) + 1
     else:
-        meta, basin = inout.inp_asc_raster(file=fbasin, dtype='float32')
+        meta, basin = inp.asc_raster(file=fbasin, dtype='float32')
     # compute standard lambdas:
     lamb1 = np.sum(twi1 * basin) / np.sum(basin)
     lamb2 = np.sum(twi2 * basin) / np.sum(basin)

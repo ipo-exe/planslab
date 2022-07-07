@@ -1,6 +1,7 @@
 import numpy as np
 import pandas as pd
 
+
 def dataframe_prepro(dataframe, strfields='Field1,Field2', strf=True, date=False, datefield='Date'):
     """
     Convenience function for pre processing dataframes
@@ -19,7 +20,7 @@ def dataframe_prepro(dataframe, strfields='Field1,Field2', strf=True, date=False
     return lcl_df
 
 
-def inp_asc_raster(file, nan=False, dtype='int16'):
+def asc_raster(file, nan=False, dtype='int16'):
     """
     A function to import .ASC raster files
     :param file: string of file path with the '.asc' extension
@@ -63,7 +64,7 @@ def inp_asc_raster(file, nan=False, dtype='int16'):
     return meta_dct, def_array
 
 
-def inp_hydroparams(fhydroparam):
+def hydroparams(fhydroparam):
     """
     Import the hydrology reference parameters to a dictionary.
     :param fhydroparam: hydro_param txt filepath
@@ -73,7 +74,21 @@ def inp_hydroparams(fhydroparam):
     hydroparam_df = dataframe_prepro(hydroparam_df, 'Parameter')
     #
     fields = ('Set', 'Min', 'Max')
-    params = ('m', 'lamb', 'qo', 'cpmax', 'sfmax', 'roots', 'ksat', 'k', 'n')
+    params = (
+              'm',
+              'lambda',
+              'qo',
+              'w',
+              'hmax',
+              'cpmax',
+              'sfmax',
+              'roots',
+              'ksat',
+              'rho',
+              'c',
+              'k',
+              'n'
+    )
     # built dict
     hydroparams_dct = dict()
     for p in params:

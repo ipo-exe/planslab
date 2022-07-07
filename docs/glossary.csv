@@ -1,0 +1,80 @@
+Name;Dtype;Description;Units;Category
+Date;date;Date of record;-;field
+Id;unique integer number;Category numerical identifyier;-;field
+Name;text;Category name;-;field
+Alias;text;Category alias (one-word only);-;field
+Color;text;CSS color name available in [matplotlib](https://matplotlib.org/stable/gallery/color/named_colors.html) (ex: `blue`) or hexadecimal code of color (ex: `#5234eb`).;-;field
+cpmax;positive real number;Effective canopy water stock capacity;mm;parameter
+sfmax;positive real number;Effective surface water stock capacity;mm;parameter
+m;positive real number;Exponential decay coefficient;mm;parameter
+lambda;positive real number;Global saturation index;unitless;parameter
+qo;positive real number;Maximum baseflow;mm/d;parameter
+ksat;positive real number;Effective soil hydraulic conductivity;mm/d;parameter
+k;positive real number;Effective residence time (Nash routing model);d;parameter
+n;positive real number;Effective number of linear reservoir (Nash routing model);unitless;parameter
+c;positive real number;Effective scaling temperature (Oudin model);Celcius;parameter
+roots;positive real number;Effective root zone depth;mm;parameter
+rho;positive real number;Effective soil porosity;unitless;parameter
+h_max;positive real number;Upper HAND threshold;m;parameter
+w;positive real number;HAND to TWI dominance ratio;unitless;parameter
+Qt0;positive real number;Streamflow (specific) when t=0 (initial condition);mm/d;parameter
+f_cpmax;positive real number;spatial factor for the `cpmax` parameter;unitless;subparameter
+f_sfmax;positive real number;spatial factor for the `sfmax` parameter;unitless;subparameter
+f_roots;positive real number;spatial factor for the `roots` parameter;unitless;subparameter
+f_iri;positive real number;spatial factor for `IRI` input;unitless;subparameter
+f_ira;positive real number;spatial factor for `IRA` input;unitless;subparameter
+f_cpmax_Alias;positive real number;temporal factor for the `cpmax` parameter for LULC types (ex: `f_cpmax_Fs` where `Fs` is the LULC Alias for `Forest`);unitless;subparameter
+f_sfmax_Alias;positive real number;temporal factor for the `sfmax` parameter for LULC types (ex: `f_sfmax_Fs` where `Fs` is the LULC Alias for `Forest`);unitless;subparameter
+f_roots_Alias;positive real number;temporal factor for the `roots` parameter for LULC types (ex: `f_roots_Fs` where `Fs` is the LULC Alias for `Forest`);unitless;subparameter
+f_ksat;positive real number;spatial factor for the `ksat` parameter;unitless;subparameter
+f_rho;positive real number;spatial factor for the `rho` parameter;unitless;subparameter
+usle_C;positive real number;USLE `C` parameter;unitless;subparameter
+usle_P;positive real number;USLE `P` parameter;unitless;subparameter
+usle_K;positive real number;USLE `K` parameter;ton h / (MJ mm);subparameter
+load_P;positive real number;Effective annual Phosphorous load;kgP / ha yr;subparameter
+load_N;positive real number;Effective annual Nitrogen load;kgN / ha yr;subparameter
+f_perv;positive real number;spatial factor of perviousness(1 = 100% pervious);unitless;subparameter
+P;positive real number;Precipitation;mm/d;variable
+T;positive real number;Mean daily temperature;Celcius;variable
+Q_obs;positive real number;Observed specific streamflow;mm/d;variable
+Flow_obs;positive real number;Observed streamflow;m3/s;variable
+IRA;positive real number;Irrigation by aspersion;mm/d;variable
+IRI;positive real number;Irrigation by inundation or dripping;mm/d;variable
+PET;positive real number;Potential evapotranspiration;mm/d;variable
+ET;positive real number;Evapotranspiration ;mm/d;variable
+Cp;positive real number;Canopy water stock;mm;variable
+Sf;positive real number;Surface water stock;mm;variable
+D;positive real number;Soil water deficit;mm;variable
+Vz;positive real number;Vadose zone water stock;mm;variable
+Inf;positive real number;Infiltration;mm/d;variable
+Intc;positive real number;Interception in canopy;mm/d;variable
+Ints;positive real number;Interception in surface;mm/d;variable
+TF;positive real number;Throughfall (effective precipitation);mm/d;variable
+R;positive real number;Runoff;mm/d;variable
+RIE;positive real number;Runoff by infiltration excess (Hortonian);mm/d;variable
+RSE;positive real number;Runoff by saturation excess (Dunnean);mm/d;variable
+RC;positive real number;Runoff coeficient (100 * R/P);%;variable
+Qv;positive real number;Recharge;mm/d;variable
+Qs;positive real number;Stormflow (specific);mm/d;variable
+Qb;positive real number;Baseflow (specific);mm/d;variable
+Q;positive real number;Streamflow (specific);mm/d;variable
+Flow;positive real number;Streamflow;m3/s;variable
+ET_obs;positive real number;Observed Evapotranspiration ;mm/d;variable
+Parameter;text;Parameter name;-;field
+Set;positive real number;Set value of parameter;-;field
+Min;positive real number;Minimum value of parameter in confidence interval;-;field
+Max;positive real number;Maximum value of parameter in confidence interval;-;field
+Var;text;Keyword for `variable`;-;keyword
+lulc;text;Keyword for Land use and Land cover types;-;keyword
+soils;text;Keyword for soil types;-;keyword
+twi;text;Keyword for Topographical Wetness Index;-;keyword
+hand;text;Keyword for Height Above the Nearest Drainage;-;keyword
+Stat;text;Keyword for `statistic`;-;keyword
+Sum;text;Keyword for `sum`;-;keyword
+Mean;text;Keyword for `Mean`;-;keyword
+Med;text;Keyword for `Median`;-;keyword
+Min;text;Keyword for `Minimum`;-;keyword
+Max;text;Keyword for `Maximum`;-;keyword
+p05;text;Keyword for `5% percentile`;-;keyword
+p95;text;Keyword for `95% percentile`;-;keyword
+SD;text;Keyword for `Standard Deviation`;-;keyword

@@ -255,7 +255,7 @@ works as a threshold for mapping local deficits. In `plans` it is relaxed as a r
 model parameter. And thus we can perform some more `SAL`:
 
 ```python
-import inout
+import inp
 import numpy as np
 
 # import tool:
@@ -272,9 +272,9 @@ _outfolder = '/content/output'
 
 # compute the standard lambda
 # load twi map
-meta, twi = inout.inp_asc_raster(file=_ftwi, dtype='float32')
+meta, twi = inout.asc_raster(file=_ftwi, dtype='float32')
 # load basin map
-meta, basin = inout.inp_asc_raster(file=_fbasin, dtype='float32')
+meta, basin = inout.asc_raster(file=_fbasin, dtype='float32')
 # standard lambda:
 lamb_mean = np.sum(twi * basin) / np.sum(basin)
 
@@ -361,9 +361,9 @@ So if you want to play directly with the model you may need some
 help:
 
 ```python
-from model import sim_g2g
+from model import simulation
 
-print(help(sim_g2g))
+print(help(simulation))
 ```
 The output will be something like this:
 ```markdown
@@ -427,11 +427,12 @@ sim_g2g(series_df, basin, twi, qt0, cpmax, sfmax, roots, qo, m, lamb, ksat, n, k
 ```
 ### the basic script
 A very basic simulation script would look like this:
+
 ```python
 import pandas as pd
 import matplotlib.pyplot as plt
-import inout
-from model import sim_g2g
+import inp
+from model import simulation
 
 # inform series dataset file
 fseries = './data/series_short.txt'
@@ -446,9 +447,9 @@ fbasin = './data/basin.asc'
 df = pd.read_csv(fseries, sep=';', parse_dates=['Date'])
 
 # load twi map
-meta, twi = inout.inp_asc_raster(file=ftwi, dtype='float32')
+meta, twi = inout.asc_raster(file=ftwi, dtype='float32')
 # load basin map
-meta, basin = inout.inp_asc_raster(file=fbasin, dtype='float32')
+meta, basin = inout.asc_raster(file=fbasin, dtype='float32')
 
 # define parameter values
 cpmax = 15
@@ -466,22 +467,22 @@ n = 2
 scale = 1000
 
 # call model function
-sim = sim_g2g(series_df=df,
-              twi=twi,
-              basin=basin,
-              cpmax=cpmax,
-              sfmax=sfmax,
-              roots=roots,
-              qo=qo,
-              m=m,
-              lamb=lamb,
-              ksat=ksat,
-              qt0=qt0,
-              k=k,
-              n=n,
-              tracevars=False,  # no map traceback
-              integrate=False,  # no map integration
-              scale=scale)
+sim = simulation(series_df=df,
+                 twi=twi,
+                 basin=basin,
+                 cpmax=cpmax,
+                 sfmax=sfmax,
+                 rzd=roots,
+                 qo=qo,
+                 m=m,
+                 lamb=lamb,
+                 ksat=ksat,
+                 qt0=qt0,
+                 k=k,
+                 n=n,
+                 tracevars=False,  # no map traceback
+                 integrate=False,  # no map integration
+                 scale=scale)
 
 # plot some variables series:
 plt.plot(sim['Series']['Date'], sim['Series']['Prec'], 'lightgrey', label='Precipitation')
