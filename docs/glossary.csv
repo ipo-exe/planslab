@@ -21,11 +21,11 @@ Qt0;positive real number;Streamflow (specific) when t=0 (initial condition);mm/d
 f_cpmax;positive real number;spatial factor for the `cpmax` parameter;unitless;subparameter
 f_sfmax;positive real number;spatial factor for the `sfmax` parameter;unitless;subparameter
 f_roots;positive real number;spatial factor for the `roots` parameter;unitless;subparameter
-f_iri;positive real number;spatial factor for `IRI` input;unitless;subparameter
-f_ira;positive real number;spatial factor for `IRA` input;unitless;subparameter
 f_cpmax_Alias;positive real number;temporal factor for the `cpmax` parameter for LULC types (ex: `f_cpmax_Fs` where `Fs` is the LULC Alias for `Forest`);unitless;subparameter
 f_sfmax_Alias;positive real number;temporal factor for the `sfmax` parameter for LULC types (ex: `f_sfmax_Fs` where `Fs` is the LULC Alias for `Forest`);unitless;subparameter
 f_roots_Alias;positive real number;temporal factor for the `roots` parameter for LULC types (ex: `f_roots_Fs` where `Fs` is the LULC Alias for `Forest`);unitless;subparameter
+f_iri;positive real number;temporal factor for  `IRI` input;unitless;subparameter
+f_ira;positive real number;temporal factor for  `IRA` input;unitless;subparameter
 f_ksat;positive real number;spatial factor for the `ksat` parameter;unitless;subparameter
 f_rho;positive real number;spatial factor for the `rho` parameter;unitless;subparameter
 usle_C;positive real number;USLE `C` parameter;unitless;subparameter
