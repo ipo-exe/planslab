@@ -72,7 +72,7 @@ def append_fields_head(s_fields, s_msg):
 #
 lst_file = list()
 s_dir_samples_url = 'https://github.com/ipo-exe/planslab/blob/main/samples'
-s_file_url =  'https://github.com/ipo-exe/planslab/blob/main/iodocs.md'
+s_file_url =  'https://github.com/ipo-exe/planslab/blob/main/docs/iodocs.md'
 # import
 df_io = pd.read_csv('./docs/iofiles.csv', sep=';')
 

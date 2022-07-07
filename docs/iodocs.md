@@ -1,24 +1,24 @@
 # I/O documentation
- - [Imported files](https://github.com/ipo-exe/planslab/blob/main/iodocs.md#imported-files)
- - [Output files](https://github.com/ipo-exe/planslab/blob/main/iodocs.md#output-files)
- - [Glossary](https://github.com/ipo-exe/planslab/blob/main/iodocs.md#glossary)
+ - [Imported files](https://github.com/ipo-exe/planslab/blob/main/docs/iodocs.md#imported-files)
+ - [Output files](https://github.com/ipo-exe/planslab/blob/main/docs/iodocs.md#output-files)
+ - [Glossary](https://github.com/ipo-exe/planslab/blob/main/docs/iodocs.md#glossary)
 
 # Imported files
 These files must be prepared and sourced by the user. Samples are provided for proper formatting.
 
 |File | Source | Format | Sample|
 |:--- | :--- | :--- | :---|
-|[param_lulc.txt](https://github.com/ipo-exe/planslab/blob/main/iodocs.md#param_lulctxt) | imported by user | Data Table | [Sample file](https://github.com/ipo-exe/planslab/blob/main/samples/param_lulc.txt)|
-|[param_soils.txt](https://github.com/ipo-exe/planslab/blob/main/iodocs.md#param_soilstxt) | imported by user | Data Table | [Sample file](https://github.com/ipo-exe/planslab/blob/main/samples/param_soils.txt)|
-|[param_hydro.txt](https://github.com/ipo-exe/planslab/blob/main/iodocs.md#param_hydrotxt) | imported by user | Data Table | [Sample file](https://github.com/ipo-exe/planslab/blob/main/samples/param_hydro.txt)|
-|[map_soils.asc](https://github.com/ipo-exe/planslab/blob/main/iodocs.md#map_soilsasc) | imported by user | Raster Map | [Sample file](https://github.com/ipo-exe/planslab/blob/main/samples/map_soils.asc)|
-|[map_lulc.asc](https://github.com/ipo-exe/planslab/blob/main/iodocs.md#map_lulcasc) | imported by user | Raster Map | [Sample file](https://github.com/ipo-exe/planslab/blob/main/samples/map_lulc.asc)|
-|[map_basin.asc](https://github.com/ipo-exe/planslab/blob/main/iodocs.md#map_basinasc) | imported by user | Raster Map | [Sample file](https://github.com/ipo-exe/planslab/blob/main/samples/map_basin.asc)|
-|[map_twi.asc](https://github.com/ipo-exe/planslab/blob/main/iodocs.md#map_twiasc) | imported by user | Raster Map | [Sample file](https://github.com/ipo-exe/planslab/blob/main/samples/map_twi.asc)|
-|[map_hand.asc](https://github.com/ipo-exe/planslab/blob/main/iodocs.md#map_handasc) | imported by user | Raster Map | [Sample file](https://github.com/ipo-exe/planslab/blob/main/samples/map_hand.asc)|
-|[map_slope.asc](https://github.com/ipo-exe/planslab/blob/main/iodocs.md#map_slopeasc) | imported by user | Raster Map | missing|
-|[map_ET_obs_Date.asc](https://github.com/ipo-exe/planslab/blob/main/iodocs.md#map_ET_obs_Dateasc) | imported by user | Raster Map | missing|
-|[series_obs.txt](https://github.com/ipo-exe/planslab/blob/main/iodocs.md#series_obstxt) | imported by user | Time Series | [Sample file](https://github.com/ipo-exe/planslab/blob/main/samples/series_obs.txt)|
+|[param_lulc.txt](https://github.com/ipo-exe/planslab/blob/main/docs/iodocs.md#param_lulctxt) | imported by user | Data Table | [Sample file](https://github.com/ipo-exe/planslab/blob/main/samples/param_lulc.txt)|
+|[param_soils.txt](https://github.com/ipo-exe/planslab/blob/main/docs/iodocs.md#param_soilstxt) | imported by user | Data Table | [Sample file](https://github.com/ipo-exe/planslab/blob/main/samples/param_soils.txt)|
+|[param_hydro.txt](https://github.com/ipo-exe/planslab/blob/main/docs/iodocs.md#param_hydrotxt) | imported by user | Data Table | [Sample file](https://github.com/ipo-exe/planslab/blob/main/samples/param_hydro.txt)|
+|[map_soils.asc](https://github.com/ipo-exe/planslab/blob/main/docs/iodocs.md#map_soilsasc) | imported by user | Raster Map | [Sample file](https://github.com/ipo-exe/planslab/blob/main/samples/map_soils.asc)|
+|[map_lulc.asc](https://github.com/ipo-exe/planslab/blob/main/docs/iodocs.md#map_lulcasc) | imported by user | Raster Map | [Sample file](https://github.com/ipo-exe/planslab/blob/main/samples/map_lulc.asc)|
+|[map_basin.asc](https://github.com/ipo-exe/planslab/blob/main/docs/iodocs.md#map_basinasc) | imported by user | Raster Map | [Sample file](https://github.com/ipo-exe/planslab/blob/main/samples/map_basin.asc)|
+|[map_twi.asc](https://github.com/ipo-exe/planslab/blob/main/docs/iodocs.md#map_twiasc) | imported by user | Raster Map | [Sample file](https://github.com/ipo-exe/planslab/blob/main/samples/map_twi.asc)|
+|[map_hand.asc](https://github.com/ipo-exe/planslab/blob/main/docs/iodocs.md#map_handasc) | imported by user | Raster Map | [Sample file](https://github.com/ipo-exe/planslab/blob/main/samples/map_hand.asc)|
+|[map_slope.asc](https://github.com/ipo-exe/planslab/blob/main/docs/iodocs.md#map_slopeasc) | imported by user | Raster Map | missing|
+|[map_ET_obs_Date.asc](https://github.com/ipo-exe/planslab/blob/main/docs/iodocs.md#map_ET_obs_Dateasc) | imported by user | Raster Map | missing|
+|[series_obs.txt](https://github.com/ipo-exe/planslab/blob/main/docs/iodocs.md#series_obstxt) | imported by user | Time Series | [Sample file](https://github.com/ipo-exe/planslab/blob/main/samples/series_obs.txt)|
 
 ## `param_lulc.txt`
  - **Description**: Table of LULC parameters;
@@ -247,17 +247,17 @@ These files are generated by the program. Note that the user may source it as in
 
 |File | Source | Format|
 |:--- | :--- | :---|
-|[param_shru.txt](https://github.com/ipo-exe/planslab/blob/main/iodocs.md#param_shrutxt) | process output | Data Table|
-|[hist2d_extent.txt](https://github.com/ipo-exe/planslab/blob/main/iodocs.md#hist2d_extenttxt) | process output | Data Table|
-|[hist2d_basin.txt](https://github.com/ipo-exe/planslab/blob/main/iodocs.md#hist2d_basintxt) | process output | Data Table|
-|[zmap_Var_Date.txt](https://github.com/ipo-exe/planslab/blob/main/iodocs.md#zmap_Var_Datetxt) | process output | Data Table|
-|[zmap_Var_Stat.txt](https://github.com/ipo-exe/planslab/blob/main/iodocs.md#zmap_Var_Stattxt) | process output | Data Table|
-|[zmap_Var_Stat_annual.txt](https://github.com/ipo-exe/planslab/blob/main/iodocs.md#zmap_Var_Stat_annualtxt) | process output | Data Table|
-|[map_shru.asc](https://github.com/ipo-exe/planslab/blob/main/iodocs.md#map_shruasc) | process output | Raster Map|
-|[map_Var_Date.asc](https://github.com/ipo-exe/planslab/blob/main/iodocs.md#map_Var_Dateasc) | process output | Raster Map|
-|[map_Var_Stat.asc](https://github.com/ipo-exe/planslab/blob/main/iodocs.md#map_Var_Statasc) | process output | Raster Map|
-|[map_Var_annual_Stat.asc](https://github.com/ipo-exe/planslab/blob/main/iodocs.md#map_Var_annual_Statasc) | process output | Raster Map|
-|[series_sim.txt](https://github.com/ipo-exe/planslab/blob/main/iodocs.md#series_simtxt) | process output | Time Series|
+|[param_shru.txt](https://github.com/ipo-exe/planslab/blob/main/docs/iodocs.md#param_shrutxt) | process output | Data Table|
+|[hist2d_extent.txt](https://github.com/ipo-exe/planslab/blob/main/docs/iodocs.md#hist2d_extenttxt) | process output | Data Table|
+|[hist2d_basin.txt](https://github.com/ipo-exe/planslab/blob/main/docs/iodocs.md#hist2d_basintxt) | process output | Data Table|
+|[zmap_Var_Date.txt](https://github.com/ipo-exe/planslab/blob/main/docs/iodocs.md#zmap_Var_Datetxt) | process output | Data Table|
+|[zmap_Var_Stat.txt](https://github.com/ipo-exe/planslab/blob/main/docs/iodocs.md#zmap_Var_Stattxt) | process output | Data Table|
+|[zmap_Var_Stat_annual.txt](https://github.com/ipo-exe/planslab/blob/main/docs/iodocs.md#zmap_Var_Stat_annualtxt) | process output | Data Table|
+|[map_shru.asc](https://github.com/ipo-exe/planslab/blob/main/docs/iodocs.md#map_shruasc) | process output | Raster Map|
+|[map_Var_Date.asc](https://github.com/ipo-exe/planslab/blob/main/docs/iodocs.md#map_Var_Dateasc) | process output | Raster Map|
+|[map_Var_Stat.asc](https://github.com/ipo-exe/planslab/blob/main/docs/iodocs.md#map_Var_Statasc) | process output | Raster Map|
+|[map_Var_annual_Stat.asc](https://github.com/ipo-exe/planslab/blob/main/docs/iodocs.md#map_Var_annual_Statasc) | process output | Raster Map|
+|[series_sim.txt](https://github.com/ipo-exe/planslab/blob/main/docs/iodocs.md#series_simtxt) | process output | Time Series|
 
 ## `param_shru.txt`
  - **Description**: Table of SHRU parameters;
