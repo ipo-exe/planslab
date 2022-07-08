@@ -167,7 +167,17 @@ for i in range(len(lst_dfs)):
             except FileNotFoundError:
                 pass
         if s_format == 'Raster Map':
-            lst_file.append('```\nRaster example\n```\n')
+            s_example = 'ncols        95\nnrows        77 \n' \
+                        'xllcorner    639958.57\n' \
+                        'yllcorner    6699796.10\n' \
+                        'cellsize     30.0\n' \
+                        'NODATA_value 0\n' \
+                        '5 5 5 5 5 5 5 5 5 5 5 3 3 3 ... 3 3 3 3 3 3 3 3 3 3 3 3 3 4\n' \
+                        '5 5 5 5 5 5 5 5 5 5 5 3 3 3 ... 3 3 3 3 3 3 3 3 3 3 3 4 4 4\n' \
+                        '                            ...  \n' \
+                        '5 5 5 5 5 5 5 5 5 5 5 3 3 3 ... 3 3 3 3 3 3 3 3 3 3 3 4 4 3\n' \
+                        '5 5 5 5 5 5 5 5 5 5 5 3 3 3 ... 3 3 3 3 3 3 3 3 3 3 3 3 3 3\n'
+            lst_file.append('```\n{}\n```\n'.format(s_example))
             lst_file.append('> See the Raster preparation tutorial\n')
         lst_file.append(' - **Requirements**:\n')
         if s_format == 'Data Table':
