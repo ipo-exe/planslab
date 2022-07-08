@@ -199,8 +199,9 @@ for i in range(len(lst_dfs)):
             lst_file.append(' - **Special requirements**:\n')
         #
         lst_file.append(' - **Data view**:\n')
-        s_view_file = './samples/view_{}.png'.format(s_filename)
-        if os.path.isfile(s_view_file):
+        s_view_filepath = './samples/view_{}.png'.format(s_filename)
+        s_view_file = 'view_{}.png'.format(s_filename)
+        if os.path.isfile(s_view_filepath):
             s_ax = '\n![{}]({}/{} "{}")\n'.format(s_filename, s_dir_samples_url, s_view_file, s_filename)
             lst_file.append(s_ax)
         else:

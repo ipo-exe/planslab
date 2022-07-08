@@ -218,7 +218,7 @@ NODATA_value -1
 	 - Default No-Data cell value: `-1`;
  - **Data view**:
 
-![map_basin](https://github.com/ipo-exe/planslab/blob/main/samples/./samples/view_map_basin.png "map_basin")
+![map_basin](https://github.com/ipo-exe/planslab/blob/main/samples/view_map_basin.png "map_basin")
 
 ## `map_twi.asc`
  - **Description**: Map of the Topographical Wetness Index (TWI);
@@ -249,7 +249,7 @@ NODATA_value -1
 	 - Default No-Data cell value: `-1`;
  - **Data view**:
 
-![map_twi](https://github.com/ipo-exe/planslab/blob/main/samples/./samples/view_map_twi.png "map_twi")
+![map_twi](https://github.com/ipo-exe/planslab/blob/main/samples/view_map_twi.png "map_twi")
 
 ## `map_hand.asc`
  - **Description**: Map of the Height Above Nearest Drainage (HAND);
@@ -280,7 +280,7 @@ NODATA_value -1
 	 - Default No-Data cell value: `-1`;
  - **Data view**:
 
-![map_hand](https://github.com/ipo-exe/planslab/blob/main/samples/./samples/view_map_hand.png "map_hand")
+![map_hand](https://github.com/ipo-exe/planslab/blob/main/samples/view_map_hand.png "map_hand")
 
 ## `map_slope.asc`
  - **Description**: Map of terrain slope;
