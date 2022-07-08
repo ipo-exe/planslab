@@ -9,7 +9,14 @@ map_twi;asc;imported by user;Raster Map;Map of the Topographical Wetness Index (
 map_hand;asc;imported by user;Raster Map;Map of the Height Above Nearest Drainage (HAND);`float32` (32-bit real);meters;1;-1;none;none;none
 map_slope;asc;imported by user;Raster Map;Map of terrain slope;`float32` (32-bit real);degrees;1;-1;none;none;none
 map_ET_obs_Date;asc;imported by user;Raster Map;Map of observed Evapotranspiration in Date (example: map_ET_obs_2022-01-29);`float32` (32-bit real);meters;1;-1;none;none;none
-map_Par;asc;imported by user;Raster Map;Map of distributed Par factor field (example: map_cpmax);`float32` (32-bit real);unitless;1;-1;none;none;none
+map_cpmax;asc;imported by user;Raster Map;Map of `cpmax` parameter spatial factor field;`float32` (32-bit real);unitless;1;-1;none;none;none
+map_sfmax;asc;imported by user;Raster Map;Map of `sfmax` parameter spatial factor field;`float32` (32-bit real);unitless;1;-1;none;none;none
+map_roots;asc;imported by user;Raster Map;Map of `roots` parameter spatial factor field;`float32` (32-bit real);unitless;1;-1;none;none;none
+map_perv;asc;imported by user;Raster Map;Map of `perv` parameter spatial factor field;`float32` (32-bit real);unitless;1;-1;none;none;none
+map_iri;asc;imported by user;Raster Map;Map of `IRI` input spatial factor field;`float32` (32-bit real);unitless;1;-1;none;none;none
+map_ira;asc;imported by user;Raster Map;Map of `IRA` input spatial factor field;`float32` (32-bit real);unitless;1;-1;none;none;none
+map_ksat;asc;imported by user;Raster Map;Map of `ksat` parameter spatial factor field;`float32` (32-bit real);unitless;1;-1;none;none;none
+map_rho;asc;imported by user;Raster Map;Map of `rho` parameter spatial factor field;`float32` (32-bit real);unitless;1;-1;none;none;none
 series_obs;txt;imported by user;Time Series;Time series of observed hydrologic processes;none;none;none;none;Date & P & T & IRA & IRI;Q_obs & Flow_obs & ET_obs & f_cpmax_Alias & f_sfmax_Alias & f_roots_Alias;none
 param_shru;txt;process output;Data Table;Table of SHRU parameters;none;none;none;none;Id & Name & Alias & f_cpmax & f_sfmax & f_roots & f_perv & usle_C & usle_P & load_N & load_P &  f_ksat & f_rho & usle_K;none;none
 hist2d_extent;txt;process output;Data Table;2-D histogram (counting matrix) of spatial units within the full map extent;none;none;none;none;none;none;none
