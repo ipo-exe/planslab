@@ -166,6 +166,9 @@ for i in range(len(lst_dfs)):
                 lst_file.append('```\n{}\n```\n'.format(s_example))
             except FileNotFoundError:
                 pass
+        if s_format == 'Raster Map':
+            lst_file.append('```\nRaster example\n```\n')
+            lst_file.append('> See the Raster preparation tutorial\n')
         lst_file.append(' - **Requirements**:\n')
         if s_format == 'Data Table':
             append_basic_table_reqs()

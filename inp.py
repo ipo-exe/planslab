@@ -1,10 +1,54 @@
+'''
+
+PLANS input routines
+
+Copyright (C) 2022 Iporã Brito Possantti
+
+References:
+
+
+************ GNU GENERAL PUBLIC LICENSE ************
+
+https://www.gnu.org/licenses/gpl-3.0.en.html
+
+Permissions:
+ - Commercial use
+ - Distribution
+ - Modification
+ - Patent use
+ - Private use
+
+Conditions:
+ - Disclose source
+ - License and copyright notice
+ - Same license
+ - State changes
+
+Limitations:
+ - Liability
+ - Warranty
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
+'''
 import numpy as np
 import pandas as pd
 
 
 def open_df(s_filepath, s_sep=';', s_date_field='', s_mandatory_fields='',):
     """
-    general dataframe openner
+    general dataframe openner with error handling
     :param s_filepath: string to file
     :param s_sep: string separator
     :param s_date_field: string datefield
@@ -32,24 +76,6 @@ def open_df(s_filepath, s_sep=';', s_date_field='', s_mandatory_fields='',):
         return {'Error Report': 'File not found', 'OK Flag': False}
     except ValueError:
         return {'Error Report': 'Invalid formatting', 'OK Flag': False}
-
-
-def dataframe_prepro(dataframe, strfields='Field1,Field2', strf=True, date=False, datefield='Date'):
-    """
-    Convenience function for pre processing dataframes
-    :param dataframe: pandas dataframe object
-    :param strfields: iterable of string fields
-    :return: pandas dataframe
-    """
-    lcl_df = dataframe.copy()
-    lcl_df.columns = lcl_df.columns.str.strip()
-    if strf:
-        fields_lst = strfields.split(',')
-        for i in range(len(fields_lst)):
-            lcl_df[fields_lst[i]] = lcl_df[fields_lst[i]].str.strip()
-    if date:
-        lcl_df[datefield] = pd.to_datetime(lcl_df[datefield])
-    return lcl_df
 
 
 def asc_raster(file, nan=False, dtype='int16'):
@@ -102,10 +128,14 @@ def hydroparams(fhydroparam):
     :param fhydroparam: hydro_param txt filepath
     :return: dictionary of dictionaries of parameters Set, Min and Max and pandas dataframe
     """
-    hydroparam_df = pd.read_csv(fhydroparam, sep=';')
-    hydroparam_df = dataframe_prepro(hydroparam_df, 'Parameter')
     #
-    fields = ('Set', 'Min', 'Max')
+    fields = ['Set', 'Min', 'Max']
+    s_fields = ' & '.join(fields)
+    #
+    hydroparam_obj = open_df(s_filepath=fhydroparam, s_sep=';', s_mandatory_fields='Set & Min & Max')
+    #
+    hydroparam_df = hydroparam_obj['df']
+    #
     params = (
               'm',
               'lambda',
@@ -130,50 +160,20 @@ def hydroparams(fhydroparam):
         hydroparams_dct[p] = lcl_dct
     return hydroparams_dct, hydroparam_df
 
-
-def out_asc_raster(array, meta, folder, filename, dtype='float32'):
+# deprecated
+def dataframe_prepro(dataframe, strfields='Field1,Field2', strf=True, date=False, datefield='Date'):
     """
-    Function for exporting an .ASC raster file.
-    :param array: 2d numpy array
-    :param meta: dicitonary of metadata. Example:
-
-    {'ncols': 366,
-     'nrows': 434,
-      'xllcorner': 559493.087150689564,
-       'yllcorner': 6704832.279550871812,
-        'cellsize': 28.854232957826,
-        'NODATA_value': -9999}
-
-    :param folder: string of directory path
-    :param filename: string of file without extension
-    :param dtype: string code of data type
-    :return: full file name (path and extension) string
+    Convenience function for pre processing dataframes
+    :param dataframe: pandas dataframe object
+    :param strfields: iterable of string fields
+    :return: pandas dataframe
     """
-    meta_lbls = ('ncols', 'nrows', 'xllcorner', 'yllcorner', 'cellsize', 'NODATA_value')
-    ndv = float(meta['NODATA_value'])
-    exp_lst = list()
-    for i in range(len(meta_lbls)):
-        line = '{}    {}\n'.format(meta_lbls[i], meta[meta_lbls[i]])
-        exp_lst.append(line)
-    # print(exp_lst)
-    #
-    # data constructor loop:
-    def_array = np.array(array, dtype=dtype)
-    for i in range(len(def_array)):
-        # replace np.nan to no data values
-        lcl_row_sum = np.sum((np.isnan(def_array[i])) * 1)
-        if lcl_row_sum > 0:
-            #print('Yeas')
-            for j in range(len(def_array[i])):
-                if np.isnan(def_array[i][j]):
-                    def_array[i][j] = int(ndv)
-        str_join = ' ' + ' '.join(np.array(def_array[i], dtype='str')) + '\n'
-        exp_lst.append(str_join)
-
-    flenm = folder + '/' + filename + '.asc'
-    fle = open(flenm, 'w+')
-    fle.writelines(exp_lst)
-    fle.close()
-    return flenm
-
-
+    lcl_df = dataframe.copy()
+    lcl_df.columns = lcl_df.columns.str.strip()
+    if strf:
+        fields_lst = strfields.split(',')
+        for i in range(len(fields_lst)):
+            lcl_df[fields_lst[i]] = lcl_df[fields_lst[i]].str.strip()
+    if date:
+        lcl_df[datefield] = pd.to_datetime(lcl_df[datefield])
+    return lcl_df

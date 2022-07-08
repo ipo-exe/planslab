@@ -1,8 +1,138 @@
+'''
+
+PLANS tools routines
+
+Copyright (C) 2022 Iporã Brito Possantti
+
+References:
+
+
+************ GNU GENERAL PUBLIC LICENSE ************
+
+https://www.gnu.org/licenses/gpl-3.0.en.html
+
+Permissions:
+ - Commercial use
+ - Distribution
+ - Modification
+ - Patent use
+ - Private use
+
+Conditions:
+ - Disclose source
+ - License and copyright notice
+ - Same license
+ - State changes
+
+Limitations:
+ - Liability
+ - Warranty
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
+'''
 import inp
 import numpy as np
 import pandas as pd
+from backend import *
+
+# basic tool demo
+def _basic_tool(s_filepath1, s_filepath2,
+                n_param1=1,
+                s_param2='dem',
+                s_folder_out='C:/bin',
+                b_wkpl=False,
+                s_label='',
+                b_tui=True):
+    # tool metadata
+    tool_dct = {
+        'Name': 'Basic Tool',
+        'Alias': 'BSC'
+    }
+    if b_tui:
+        status('{} {} {}'.format('*'*20, tool_dct['Name'], '*'*20))
+    # folder setup
+    if b_wkpl:  # if the passed folder is a workplace, create a sub folder
+        if b_tui:
+            status('creating output folder', process=True)
+        if s_label != '':
+            s_label = s_label + '_'
+        s_folder_out = create_rundir(label=s_label + tool_dct['Alias'], wkplc=s_folder_out)
+    # imports
+    if b_tui:
+        status('importing datasets', process=True)
+    # processing
+    if b_tui:
+        status('processing datasets', process=True)
+    # export data
+    if b_tui:
+        status('exporting datasets', process=True)
+    # export visuals
+    if b_tui:
+        status('exporting visuals', process=True)
+    # returns
+    return {'Folder': s_folder_out}
 
 
+def plot_scalar_map(
+    s_mapfile,
+    s_mapid='twi',
+    s_ttl = 'TWI',
+    s_filename = 'twi',
+    s_folder_out='C:/bin',
+    b_wkpl=False,
+    s_label='',
+    b_tui=True
+    ):
+    import inp, out, visuals
+    # tool metadata
+    tool_dct = {
+        'Name': 'Plot Map',
+        'Alias': 'PLTMAP'
+    }
+    if b_tui:
+        status('{} {} {}'.format('*'*20, tool_dct['Name'], '*'*20))
+    # folder setup
+    if b_wkpl:  # if the passed folder is a workplace, create a sub folder
+        if b_tui:
+            status('creating output folder', process=True)
+        if s_label != '':
+            s_label = s_label + '_'
+        s_folder_out = create_rundir(label=s_label + tool_dct['Alias'], wkplc=s_folder_out)
+    # imports
+    if b_tui:
+        status('importing map', process=True)
+        status('file: {}'.format(s_mapfile), process=True)
+    meta, grd_map = inp.asc_raster(file=s_mapfile, dtype='float32')
+    # export visuals
+    if b_tui:
+        status('exporting visuals', process=True)
+    visuals.plot_map_view(
+        map2d=grd_map,
+        meta=meta,
+        ranges=(0, np.max(grd_map)),
+        mapid=s_mapid,
+        mapttl=s_ttl,
+        filename=s_filename,
+        folder=s_folder_out,
+        metadata=True,
+        show=False,
+    )
+    # returns
+    return {'Folder': s_folder_out}
+
+# TODO review
 def slh_sim_g2g(fseries, ftwi, fbasin,
                 fparams='none',
                 fcpmax='none',
@@ -11,11 +141,11 @@ def slh_sim_g2g(fseries, ftwi, fbasin,
                 fksat='none',
                 pannel=True,
                 trace=True,
-                tracevars='Cpy-D',
+                tracevars='Cp-D',
                 integrate=True,
-                integratevars='Cpy-D',
+                integratevars='Cp-D',
                 animate=True,
-                folder='C:/bin',
+                folder='C:/data',
                 wkpl=True,
                 label='',
                 scale=1000,
@@ -521,7 +651,4 @@ def sal_d_by_twi(ftwi1, ftwi2,
             file_path = os.path.join(png_dir, file_name)
             images.append(imageio.imread(file_path))
     imageio.mimsave(gifname, images)
-
-
-
 

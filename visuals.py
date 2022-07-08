@@ -1,3 +1,47 @@
+'''
+
+PLANS visuals routines
+
+Copyright (C) 2022 Iporã Brito Possantti
+
+References:
+
+
+************ GNU GENERAL PUBLIC LICENSE ************
+
+https://www.gnu.org/licenses/gpl-3.0.en.html
+
+Permissions:
+ - Commercial use
+ - Distribution
+ - Modification
+ - Patent use
+ - Private use
+
+Conditions:
+ - Disclose source
+ - License and copyright notice
+ - Same license
+ - State changes
+
+Limitations:
+ - Liability
+ - Warranty
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
+'''
 import matplotlib.pyplot as plt
 import matplotlib as mpl
 import numpy as np
@@ -7,6 +51,7 @@ import warnings
 warnings.filterwarnings("ignore")
 
 
+# silent routines
 def _custom_cmaps():
     from matplotlib import cm
     from matplotlib.colors import ListedColormap
@@ -25,6 +70,41 @@ def _custom_cmaps():
     return {'flow_v':jetcm, 'D':jetcm2, 'flow':earthcm, 'stk':viridiscm, 'sed':'hot_r'}
 
 
+def _maps_dct():
+    cmaps = _custom_cmaps()
+    dct_cmaps = {
+       'dem': ['BrBG_r', 'm'],
+       'hand': ['BrBG_r', 'm'],
+       'slope': ['OrRd', 'Degrees'],
+       'c_usle': ['YlGn_r', 'Index units'],
+       'p_usle': ['YlOrBr', 'Index units'],
+       'k_usle': ['Oranges', 'ton h MJ-1 mm-1 '],
+       's_rusle': ['OrRd', 'Index units'],
+       'l_rusle': ['OrRd', 'Index units'],
+       'a_usle_m': ['hot_r', 'ton/year'],
+       'n_load': ['YlOrBr', 'kg-N/year'],
+       'p_load': ['PuRd', 'kg-P/year'],
+       'twi': ['YlGnBu', 'Index units'],
+       'htwi': ['YlGnBu', 'Index units'],
+       'twito': ['YlGnBu', 'Index units'],
+       'fto': ['Blues', 'Index units'],
+       'etpat': ['Greys_r', 'Index units'],
+       'catcha': ['Blues', 'Sq. Meters (log10)'],
+       'ndvi': ['Spectral', 'NDVI units'],
+       'basin': ['Greys', 'Boolean'],
+       'flow': [cmaps['flow'], 'mm/d', 'mm'],
+       'flow_v': [cmaps['flow_v'], 'mm/d', 'mm'],
+       'stock': [cmaps['stk'], 'mm', 'mm'],
+       'deficit': [cmaps['D'], 'mm', 'mm'],
+       'VSA': ['Blues', 'Boolean', '%'],
+       'RC': ['YlOrRd', '%', '%'],
+       'anom': ['seismic_r', 'Anomaly units'],
+       'unc': ['inferno', 'Uncertainty units', '%'],
+       'else': ['Greys', '-']
+    }
+    return dct_cmaps
+
+# frames
 def sal_deficit_frame(dgbl, d1, vsa1, d2, vsa2, p1, p2,
                       p_lbl='m',
                       vmax=500,
@@ -74,16 +154,20 @@ def sal_deficit_frame(dgbl, d1, vsa1, d2, vsa2, p1, p2,
     plt.close(fig)
 
 
-def plot_map_view(map2d, meta, ranges,
-                  mapid='dem',
-                  mapttl='',
-                  filename='mapview',
-                  folder='C:/bin',
-                  metadata=True,
-                  show=False,
-                  integration=False,
-                  png=True,
-                  nodata=-1):
+def plot_map_view(
+    map2d,
+    meta,
+    ranges,
+    mapid='dem',
+    mapttl='',
+    filename='view',
+    folder='C:/bin',
+    metadata=True,
+    show=False,
+    integration=False,
+    png=True,
+    nodata=-1
+    ):
     """
 
     Plot a generic map view
@@ -101,32 +185,12 @@ def plot_map_view(map2d, meta, ranges,
     :param png: boolean to export as PNG
     :return: string filepath
     """
-    cmaps = _custom_cmaps()
-    map_dct = {'dem': ['BrBG_r', 'Elevation'],
-               'slope': ['OrRd', 'Degrees'],
-               'c_usle':['YlGn_r', 'Index units'],
-               'p_usle': ['YlOrBr', 'Index units'],
-               'k_usle': ['Oranges', 'ton h MJ-1 mm-1 '],
-               's_rusle': ['OrRd', 'Index units'],
-               'l_rusle': ['OrRd', 'Index units'],
-               'a_usle_m': ['hot_r', 'ton/year'],
-               'n_load': ['YlOrBr', 'kg-N/year'],
-               'p_load': ['PuRd', 'kg-P/year'],
-               'twi': ['YlGnBu', 'Index units'],
-               'twito': ['YlGnBu', 'Index units'],
-               'fto': ['Blues', 'Index units'],
-               'etpat': ['Greys_r', 'Index units'],
-               'catcha': ['Blues', 'Sq. Meters (log10)'],
-               'ndvi':['Spectral', 'NDVI units'],
-               'basin': ['Greys', 'Boolean'],
-               'flow':[cmaps['flow'], 'mm/d', 'mm'],
-               'flow_v':[cmaps['flow_v'], 'mm/d', 'mm'],
-               'stock':[cmaps['stk'], 'mm', 'mm'],
-               'deficit':[cmaps['D'], 'mm', 'mm'],
-               'VSA':['Blues', 'Boolean', '%'],
-               'RC':['YlOrRd', '%', '%'],
-               'anom': ['seismic_r', 'Anomaly units'],
-               'unc':['inferno', 'Uncertainty units', '%']}
+    # get cmaps
+    map_dct = _maps_dct()
+    try:
+        map_spec = map_dct[mapid]
+    except KeyError:
+        mapid = 'else'
     #
     fig = plt.figure(figsize=(6, 4.5))  # Width, Height
     gs = mpl.gridspec.GridSpec(3, 4, wspace=0.0, hspace=0.0, left=0.05, bottom=0.05, top=0.95, right=0.95)
@@ -148,12 +212,14 @@ def plot_map_view(map2d, meta, ranges,
     else:
         plt.text(x=-0.45, y=0.75, s=map_dct[mapid][1])
     if metadata:
-        plt.text(x=0.0, y=0.3, s='Metadata:')
-        plt.text(x=0.0, y=0.25, s='Rows: {}'.format(meta['nrows']))
-        plt.text(x=0.0, y=0.2, s='Columns: {}'.format(meta['ncols']))
-        plt.text(x=0.0, y=0.15, s='Cell size: {:.1f} m'.format(meta['cellsize']))
-        plt.text(x=0.0, y=0.1, s='xll: {:.2f} m'.format(meta['xllcorner']))
-        plt.text(x=0.0, y=0.05, s='yll: {:.2f} m'.format(meta['yllcorner']))
+        n_fsize = 9
+        n_x = 0.1
+        plt.text(x=n_x, y=0.3, s='Metadata:', fontsize=n_fsize)
+        plt.text(x=n_x, y=0.25, s='Rows: {}'.format(meta['nrows']) , fontsize=n_fsize)
+        plt.text(x=n_x, y=0.2, s='Columns: {}'.format(meta['ncols']), fontsize=n_fsize)
+        plt.text(x=n_x, y=0.15, s='Cell size: {:.1f} m'.format(meta['cellsize']), fontsize=n_fsize)
+        plt.text(x=n_x, y=0.1, s='xll: {:.2f} m'.format(meta['xllcorner']), fontsize=n_fsize)
+        plt.text(x=n_x, y=0.05, s='yll: {:.2f} m'.format(meta['yllcorner']), fontsize=n_fsize)
     plt.axis('off')
     #
     if show:
@@ -183,22 +249,12 @@ def export_map_views(map3d, series, meta, ranges,
                      tui=False):
     from backend import status
 
-    def id_label(id):
-        if id < 10:
-            return '000' + str(id)
-        elif id >= 10 and id < 100:
-            return '00' + str(id)
-        elif id >= 100 and id < 1000:
-            return '0' + str(id)
-        elif id >= 1000 and id < 10000:
-            return  str(id)
-
     dates_labels = pd.to_datetime(series['Date'], format='%Y%m%d')
     dates_labels = dates_labels.astype('str')
     for t in range(len(map3d)):
         if tui:
             status('exporting {} frame {} of {}'.format(mapttl, t + 1, len(map3d)))
-        lcl_filename = '{}_{}'.format(filename, id_label(id=t))
+        lcl_filename = '{}_{}'.format(filename, str(t).zfill(5))
         lcl_map = map3d[t] / scale
         plot_map_view(map2d=lcl_map,
                       meta=meta,

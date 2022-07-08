@@ -92,6 +92,56 @@ def demo_sal_twi():
                  folder=_outfolder)
 
 
+def demo_plot_scalar_map():
+    from tools import plot_scalar_map
+    # define parameters
+    s_dirout = '/home/ipora/Documents/bin'
+    s_mapfile = './samples/map_ksat.asc'
+    s_name = s_mapfile.split('_')[-1].split('.')[0].lower()
+    # call tool
+    plot_scalar_map(
+        s_mapfile=s_mapfile,
+        s_mapid=s_name,
+        s_ttl='{}'.format(s_name.upper()),
+        s_filename='view_{}'.format(s_name),
+        s_folder_out=s_dirout,
+        b_wkpl=True,
+        s_label='',
+        b_tui=True,
+    )
+
+def demo_plot_scalar_map_batch():
+    import os
+    from tools import plot_scalar_map
+    # define folder
+    s_folder = './samples'
+    # select files
+    lst_files_all = os.listdir(s_folder)
+    lst_files = list()
+    for f in lst_files_all:
+        if '.asc' in f:
+            lst_files.append('{}/{}'.format(s_folder, f))
+    # main loop:
+    for f in lst_files:
+        if 'lulc' in f or 'soils' in f or 'shru' in f:
+            pass
+        else:
+            # define parameters
+            s_dirout = s_folder
+            s_mapfile = f
+            s_name = s_mapfile.split('_')[-1].split('.')[0].lower()
+            # call tool
+            plot_scalar_map(
+                s_mapfile=s_mapfile,
+                s_mapid=s_name,
+                s_ttl='{}'.format(s_name.upper()),
+                s_filename='view_map_{}'.format(s_name),
+                s_folder_out=s_dirout,
+                b_wkpl=False,
+                s_label='',
+                b_tui=True,
+            )
+
 def demo_g2g_model():
     import pandas as pd
     import matplotlib.pyplot as plt
@@ -196,5 +246,6 @@ def demo_g2g_model():
     plt.show()
 
 
+demo_plot_scalar_map_batch()
 
-demo_g2g_model()
+#demo_g2g_model()
