@@ -18,10 +18,11 @@ These files must be prepared and sourced by the user. Samples are provided for p
 |[map_hand.asc](https://github.com/ipo-exe/planslab/blob/main/docs/iodocs.md#map_handasc) | imported by user | Raster Map | [Sample file](https://github.com/ipo-exe/planslab/blob/main/samples/map_hand.asc)|
 |[map_slope.asc](https://github.com/ipo-exe/planslab/blob/main/docs/iodocs.md#map_slopeasc) | imported by user | Raster Map | missing|
 |[map_ET_obs_Date.asc](https://github.com/ipo-exe/planslab/blob/main/docs/iodocs.md#map_ET_obs_Dateasc) | imported by user | Raster Map | missing|
+|[map_Par.asc](https://github.com/ipo-exe/planslab/blob/main/docs/iodocs.md#map_Parasc) | imported by user | Raster Map | missing|
 |[series_obs.txt](https://github.com/ipo-exe/planslab/blob/main/docs/iodocs.md#series_obstxt) | imported by user | Time Series | [Sample file](https://github.com/ipo-exe/planslab/blob/main/samples/series_obs.txt)|
 
 ## `param_lulc.txt`
- - **Description**: Table of LULC parameters;
+ - **Description**: Table of LULC parameters ;
  - **Source**: imported by user;
  - **File sample**: [param_lulc.txt](https://github.com/ipo-exe/planslab/blob/main/samples/param_lulc.txt);
  - **Format**: Data Table;
@@ -50,12 +51,15 @@ Id;    Name; Alias;   Color; f_cpmax; f_sfmax; f_roots; f_perv; f_iri; f_ira; us
 |` f_sfmax ` | positive real number | spatial factor for the `sfmax` parameter | unitless|
 |` f_roots ` | positive real number | spatial factor for the `roots` parameter | unitless|
 |` f_perv ` | positive real number | spatial factor of perviousness(1 = 100% pervious) | unitless|
-|` f_iri ` | positive real number | temporal factor for  `IRI` input | unitless|
-|` f_ira ` | positive real number | temporal factor for  `IRA` input | unitless|
+|` f_iri ` | positive real number | spatial factor for the `IRI` input | unitless|
+|` f_ira ` | positive real number | spatial factor for the `IRA` input | unitless|
 |` usle_C ` | positive real number | USLE `C` parameter | unitless|
 |` usle_P ` | positive real number | USLE `P` parameter | unitless|
 |` load_N ` | positive real number | Effective annual Nitrogen load | kgN / ha yr|
 |` load_P` | positive real number | Effective annual Phosphorous load | kgP / ha yr|
+ - **Data view**:
+
+missing file
 
 ## `param_soils.txt`
  - **Description**: Table of Soils parameters;
@@ -82,6 +86,9 @@ Id;               Name; Alias;  Color; f_ksat; f_rho; usle_K
 |` f_ksat ` | positive real number | spatial factor for the `ksat` parameter | unitless|
 |` f_rho ` | positive real number | spatial factor for the `rho` parameter | unitless|
 |` usle_K` | positive real number | USLE `K` parameter | ton h / (MJ mm)|
+ - **Data view**:
+
+missing file
 
 ## `param_hydro.txt`
  - **Description**: Table of model parameters;
@@ -116,6 +123,9 @@ Parameter;    Set;   Min;    Max
 |` Set ` | positive real number | Set value of parameter | -|
 |` Min ` | positive real number | Minimum value of parameter in confidence interval | -|
 |` Max` | positive real number | Maximum value of parameter in confidence interval | -|
+ - **Data view**:
+
+missing file
 
 ## `map_soils.asc`
  - **Description**: Map of Soils types;
@@ -129,7 +139,7 @@ nrows        77
 xllcorner    639958.57
 yllcorner    6699796.10
 cellsize     30.0
-NODATA_value 0
+NODATA_value -1
 5 5 5 5 5 5 5 5 5 5 5 3 3 3 ... 3 3 3 3 3 3 3 3 3 3 3 3 3 4
 5 5 5 5 5 5 5 5 5 5 5 3 3 3 ... 3 3 3 3 3 3 3 3 3 3 3 4 4 4
                             ...  
@@ -137,12 +147,16 @@ NODATA_value 0
 5 5 5 5 5 5 5 5 5 5 5 3 3 3 ... 3 3 3 3 3 3 3 3 3 3 3 3 3 3
 
 ```
-> See the raster map preparation tutorial
+> See the Raster preparation tutorial
  - **Requirements**:
-	 - Void cells value: not allowed - all grid cells must be filled with data;
 	 - Rows and columns must match the same size of other related raster maps;
 	 - CRS must be projected (coordinates in meters);
 	 - Grid cells must be squared;
+	 - All grid cells must be filled with values;
+	 - Default No-Data cell value: `-1`;
+ - **Data view**:
+
+missing file
 
 ## `map_lulc.asc`
  - **Description**: Map of LULC (land use and land cover) classes;
@@ -153,10 +167,10 @@ NODATA_value 0
 ```
 ncols        95
 nrows        77 
-xllcorner    639958.572750000050
-yllcorner    6699796.106709999964
+xllcorner    639958.57
+yllcorner    6699796.10
 cellsize     30.0
-NODATA_value 0
+NODATA_value -1
 5 5 5 5 5 5 5 5 5 5 5 3 3 3 ... 3 3 3 3 3 3 3 3 3 3 3 3 3 4
 5 5 5 5 5 5 5 5 5 5 5 3 3 3 ... 3 3 3 3 3 3 3 3 3 3 3 4 4 4
                             ...  
@@ -166,10 +180,14 @@ NODATA_value 0
 ```
 > See the Raster preparation tutorial
  - **Requirements**:
-	 - Void cells value: not allowed - all grid cells must be filled with data;
 	 - Rows and columns must match the same size of other related raster maps;
 	 - CRS must be projected (coordinates in meters);
 	 - Grid cells must be squared;
+	 - All grid cells must be filled with values;
+	 - Default No-Data cell value: `-1`;
+ - **Data view**:
+
+missing file
 
 ## `map_basin.asc`
  - **Description**: Basin boolean map;
@@ -180,10 +198,10 @@ NODATA_value 0
 ```
 ncols        95
 nrows        77 
-xllcorner    639958.572750000050
-yllcorner    6699796.106709999964
+xllcorner    639958.57
+yllcorner    6699796.10
 cellsize     30.0
-NODATA_value 0
+NODATA_value -1
 5 5 5 5 5 5 5 5 5 5 5 3 3 3 ... 3 3 3 3 3 3 3 3 3 3 3 3 3 4
 5 5 5 5 5 5 5 5 5 5 5 3 3 3 ... 3 3 3 3 3 3 3 3 3 3 3 4 4 4
                             ...  
@@ -193,10 +211,14 @@ NODATA_value 0
 ```
 > See the Raster preparation tutorial
  - **Requirements**:
-	 - Void cells value: not allowed - all grid cells must be filled with data;
 	 - Rows and columns must match the same size of other related raster maps;
 	 - CRS must be projected (coordinates in meters);
 	 - Grid cells must be squared;
+	 - All grid cells must be filled with values;
+	 - Default No-Data cell value: `-1`;
+ - **Data view**:
+
+![map_basin](https://github.com/ipo-exe/planslab/blob/main/samples/./samples/view_map_basin.png "map_basin")
 
 ## `map_twi.asc`
  - **Description**: Map of the Topographical Wetness Index (TWI);
@@ -207,10 +229,10 @@ NODATA_value 0
 ```
 ncols        95
 nrows        77 
-xllcorner    639958.572750000050
-yllcorner    6699796.106709999964
+xllcorner    639958.57
+yllcorner    6699796.10
 cellsize     30.0
-NODATA_value 0
+NODATA_value -1
 5 5 5 5 5 5 5 5 5 5 5 3 3 3 ... 3 3 3 3 3 3 3 3 3 3 3 3 3 4
 5 5 5 5 5 5 5 5 5 5 5 3 3 3 ... 3 3 3 3 3 3 3 3 3 3 3 4 4 4
                             ...  
@@ -220,10 +242,14 @@ NODATA_value 0
 ```
 > See the Raster preparation tutorial
  - **Requirements**:
-	 - Void cells value: not allowed - all grid cells must be filled with data;
 	 - Rows and columns must match the same size of other related raster maps;
 	 - CRS must be projected (coordinates in meters);
 	 - Grid cells must be squared;
+	 - All grid cells must be filled with values;
+	 - Default No-Data cell value: `-1`;
+ - **Data view**:
+
+![map_twi](https://github.com/ipo-exe/planslab/blob/main/samples/./samples/view_map_twi.png "map_twi")
 
 ## `map_hand.asc`
  - **Description**: Map of the Height Above Nearest Drainage (HAND);
@@ -234,10 +260,10 @@ NODATA_value 0
 ```
 ncols        95
 nrows        77 
-xllcorner    639958.572750000050
-yllcorner    6699796.106709999964
+xllcorner    639958.57
+yllcorner    6699796.10
 cellsize     30.0
-NODATA_value 0
+NODATA_value -1
 5 5 5 5 5 5 5 5 5 5 5 3 3 3 ... 3 3 3 3 3 3 3 3 3 3 3 3 3 4
 5 5 5 5 5 5 5 5 5 5 5 3 3 3 ... 3 3 3 3 3 3 3 3 3 3 3 4 4 4
                             ...  
@@ -247,10 +273,14 @@ NODATA_value 0
 ```
 > See the Raster preparation tutorial
  - **Requirements**:
-	 - Void cells value: not allowed - all grid cells must be filled with data;
 	 - Rows and columns must match the same size of other related raster maps;
 	 - CRS must be projected (coordinates in meters);
 	 - Grid cells must be squared;
+	 - All grid cells must be filled with values;
+	 - Default No-Data cell value: `-1`;
+ - **Data view**:
+
+![map_hand](https://github.com/ipo-exe/planslab/blob/main/samples/./samples/view_map_hand.png "map_hand")
 
 ## `map_slope.asc`
  - **Description**: Map of terrain slope;
@@ -261,10 +291,10 @@ NODATA_value 0
 ```
 ncols        95
 nrows        77 
-xllcorner    639958.572750000050
-yllcorner    6699796.106709999964
+xllcorner    639958.57
+yllcorner    6699796.10
 cellsize     30.0
-NODATA_value 0
+NODATA_value -1
 5 5 5 5 5 5 5 5 5 5 5 3 3 3 ... 3 3 3 3 3 3 3 3 3 3 3 3 3 4
 5 5 5 5 5 5 5 5 5 5 5 3 3 3 ... 3 3 3 3 3 3 3 3 3 3 3 4 4 4
                             ...  
@@ -274,13 +304,17 @@ NODATA_value 0
 ```
 > See the Raster preparation tutorial
  - **Requirements**:
-	 - Void cells value: not allowed - all grid cells must be filled with data;
 	 - Rows and columns must match the same size of other related raster maps;
 	 - CRS must be projected (coordinates in meters);
 	 - Grid cells must be squared;
+	 - All grid cells must be filled with values;
+	 - Default No-Data cell value: `-1`;
+ - **Data view**:
+
+missing file
 
 ## `map_ET_obs_Date.asc`
- - **Description**: Map of observed Evapotranspiration in Date={Date};
+ - **Description**: Map of observed Evapotranspiration in Date (example: map_ET_obs_2022-01-29);
  - **Source**: imported by user;
  - **File sample**: _missing_;
  - **Format**: Raster Map;
@@ -288,10 +322,10 @@ NODATA_value 0
 ```
 ncols        95
 nrows        77 
-xllcorner    639958.572750000050
-yllcorner    6699796.106709999964
+xllcorner    639958.57
+yllcorner    6699796.10
 cellsize     30.0
-NODATA_value 0
+NODATA_value -1
 5 5 5 5 5 5 5 5 5 5 5 3 3 3 ... 3 3 3 3 3 3 3 3 3 3 3 3 3 4
 5 5 5 5 5 5 5 5 5 5 5 3 3 3 ... 3 3 3 3 3 3 3 3 3 3 3 4 4 4
                             ...  
@@ -301,10 +335,45 @@ NODATA_value 0
 ```
 > See the Raster preparation tutorial
  - **Requirements**:
-	 - Void cells value: not allowed - all grid cells must be filled with data;
 	 - Rows and columns must match the same size of other related raster maps;
 	 - CRS must be projected (coordinates in meters);
 	 - Grid cells must be squared;
+	 - All grid cells must be filled with values;
+	 - Default No-Data cell value: `-1`;
+ - **Data view**:
+
+missing file
+
+## `map_Par.asc`
+ - **Description**: Map of distributed Par factor field (example: map_cpmax);
+ - **Source**: imported by user;
+ - **File sample**: _missing_;
+ - **Format**: Raster Map;
+ - **Formating example**:
+```
+ncols        95
+nrows        77 
+xllcorner    639958.57
+yllcorner    6699796.10
+cellsize     30.0
+NODATA_value -1
+5 5 5 5 5 5 5 5 5 5 5 3 3 3 ... 3 3 3 3 3 3 3 3 3 3 3 3 3 4
+5 5 5 5 5 5 5 5 5 5 5 3 3 3 ... 3 3 3 3 3 3 3 3 3 3 3 4 4 4
+                            ...  
+5 5 5 5 5 5 5 5 5 5 5 3 3 3 ... 3 3 3 3 3 3 3 3 3 3 3 4 4 3
+5 5 5 5 5 5 5 5 5 5 5 3 3 3 ... 3 3 3 3 3 3 3 3 3 3 3 3 3 3
+
+```
+> See the Raster preparation tutorial
+ - **Requirements**:
+	 - Rows and columns must match the same size of other related raster maps;
+	 - CRS must be projected (coordinates in meters);
+	 - Grid cells must be squared;
+	 - All grid cells must be filled with values;
+	 - Default No-Data cell value: `-1`;
+ - **Data view**:
+
+missing file
 
 ## `series_obs.txt`
  - **Description**: Time series of observed hydrologic processes;
@@ -313,20 +382,20 @@ NODATA_value 0
  - **Format**: Time Series;
  - **Formating example**:
 ```
-      Date;     P;     T; IRA; IRI;              Q_obs; f_cpmax_Ric; f_sfmax_Ric; f_roots_Ric; f_cpmax_Soy; f_sfmax_Soy; f_roots_Soy
-2013-01-01;  11.9; 24.25; 0.0; 0.0; 1.8918918284424373;         0.2;         0.2;         0.2;         0.2;         0.2;         0.2
-2013-01-02;   0.0; 25.85; 0.0; 0.0; 1.8813965688487584;         0.2;         0.2;         0.2;         0.2;         0.2;         0.2
-2013-01-03; 8.675; 26.55; 0.0; 0.0; 1.8709013092550792;         0.2;         0.2;         0.2;         0.2;         0.2;         0.2
-2013-01-04;   0.2;  25.7; 0.0; 0.0; 1.8604060496613992;         0.2;         0.2;         0.2;         0.2;         0.2;         0.2
-2013-01-05;  16.0;  24.5; 0.0; 0.0; 1.8552018961625285;         0.2;         0.2;         0.2;         0.2;         0.2;         0.2
-2013-01-06;  21.4;  25.1; 0.0; 0.0; 1.8525892550790068;         0.2;         0.2;         0.2;         0.2;         0.2;         0.2
-2013-01-07;  0.95;  25.6; 0.0; 0.0;  1.849976613995485;         0.2;         0.2;         0.2;         0.2;         0.2;         0.2
+      Date;     P;     T; IRA; IRI; Q_obs; f_cpmax_Ric; f_sfmax_Ric; f_roots_Ric; f_cpmax_Soy; f_sfmax_Soy; f_roots_Soy
+2013-01-01;  11.9; 24.25; 0.0; 0.0; 1.892;         0.2;         0.2;         0.2;         0.2;         0.2;         0.2
+2013-01-02;   0.0; 25.85; 0.0; 0.0; 1.881;         0.2;         0.2;         0.2;         0.2;         0.2;         0.2
+2013-01-03; 8.675; 26.55; 0.0; 0.0; 1.871;         0.2;         0.2;         0.2;         0.2;         0.2;         0.2
+2013-01-04;   0.2;  25.7; 0.0; 0.0;  1.86;         0.2;         0.2;         0.2;         0.2;         0.2;         0.2
+2013-01-05;  16.0;  24.5; 0.0; 0.0; 1.855;         0.2;         0.2;         0.2;         0.2;         0.2;         0.2
+2013-01-06;  21.4;  25.1; 0.0; 0.0; 1.853;         0.2;         0.2;         0.2;         0.2;         0.2;         0.2
+2013-01-07;  0.95;  25.6; 0.0; 0.0;  1.85;         0.2;         0.2;         0.2;         0.2;         0.2;         0.2
 ```
  - **Requirements**:
 	 - Field separator: semicolon `;`;
 	 - Decimal separator: period `.`;
 	 - Time resolution: daily timesteps;
-	 - Date format: `YYYY-MM-DD`;
+	 - Date format: `YYYY-MM-DD` (example: `2022-01-29`);
  - **Mandatory Fields**:
 
 |Field Name | Data Type | Description | Units|
@@ -346,6 +415,9 @@ NODATA_value 0
 |` f_cpmax_Alias ` | positive real number | temporal factor for the `cpmax` parameter for LULC types (ex: `f_cpmax_Fs` where `Fs` is the LULC Alias for `Forest`) | unitless|
 |` f_sfmax_Alias ` | positive real number | temporal factor for the `sfmax` parameter for LULC types (ex: `f_sfmax_Fs` where `Fs` is the LULC Alias for `Forest`) | unitless|
 |` f_roots_Alias` | positive real number | temporal factor for the `roots` parameter for LULC types (ex: `f_roots_Fs` where `Fs` is the LULC Alias for `Forest`) | unitless|
+ - **Data view**:
+
+missing file
 
 # Output files
 These files are generated by the program. Note that the user may source it as input to other processes.
@@ -390,6 +462,9 @@ These files are generated by the program. Note that the user may source it as in
 |`  f_ksat ` | positive real number | spatial factor for the `ksat` parameter | unitless|
 |` f_rho ` | positive real number | spatial factor for the `rho` parameter | unitless|
 |` usle_K` | positive real number | USLE `K` parameter | ton h / (MJ mm)|
+ - **Data view**:
+
+missing file
 
 ## `hist2d_extent.txt`
  - **Description**: 2-D histogram (counting matrix) of spatial units within the full map extent;
@@ -399,6 +474,9 @@ These files are generated by the program. Note that the user may source it as in
  - **Requirements**:
 	 - Field separator: semicolon `;`;
 	 - Decimal separator: period `.`;
+ - **Data view**:
+
+missing file
 
 ## `hist2d_basin.txt`
  - **Description**: 2-D histogram (counting matrix) of spatial units within the basin extent;
@@ -408,33 +486,45 @@ These files are generated by the program. Note that the user may source it as in
  - **Requirements**:
 	 - Field separator: semicolon `;`;
 	 - Decimal separator: period `.`;
+ - **Data view**:
+
+missing file
 
 ## `zmap_Var_Date.txt`
- - **Description**: ZMap of simulated Var={Var} in Date={Date} (ex: zmap_Inf_2022-02-01);
+ - **Description**: ZMap of simulated Var in Date (ex: zmap_Inf_2022-02-01);
  - **Source**: process output;
  - **Format**: Data Table;
  - **Formating example**:
  - **Requirements**:
 	 - Field separator: semicolon `;`;
 	 - Decimal separator: period `.`;
+ - **Data view**:
+
+missing file
 
 ## `zmap_Var_Stat.txt`
- - **Description**: ZMap of the statistics Stat={Stat} of simulated Var={Var} (ex: zmap_Inf_Sum);
+ - **Description**: ZMap of the statistics Stat of simulated Var (ex: zmap_Inf_Sum);
  - **Source**: process output;
  - **Format**: Data Table;
  - **Formating example**:
  - **Requirements**:
 	 - Field separator: semicolon `;`;
 	 - Decimal separator: period `.`;
+ - **Data view**:
+
+missing file
 
 ## `zmap_Var_Stat_annual.txt`
- - **Description**: ZMap of the statistics Stat={Stat} of simulated Var={Var} in annual scale (ex: zmap_Inf_Sum_annual);
+ - **Description**: ZMap of the statistics Stat of simulated Var in annual scale (ex: zmap_Inf_Sum_annual);
  - **Source**: process output;
  - **Format**: Data Table;
  - **Formating example**:
  - **Requirements**:
 	 - Field separator: semicolon `;`;
 	 - Decimal separator: period `.`;
+ - **Data view**:
+
+missing file
 
 ## `map_shru.asc`
  - **Description**: Map of SHRU (surface hydrologic response units);
@@ -444,10 +534,10 @@ These files are generated by the program. Note that the user may source it as in
 ```
 ncols        95
 nrows        77 
-xllcorner    639958.572750000050
-yllcorner    6699796.106709999964
+xllcorner    639958.57
+yllcorner    6699796.10
 cellsize     30.0
-NODATA_value 0
+NODATA_value -1
 5 5 5 5 5 5 5 5 5 5 5 3 3 3 ... 3 3 3 3 3 3 3 3 3 3 3 3 3 4
 5 5 5 5 5 5 5 5 5 5 5 3 3 3 ... 3 3 3 3 3 3 3 3 3 3 3 4 4 4
                             ...  
@@ -457,23 +547,27 @@ NODATA_value 0
 ```
 > See the Raster preparation tutorial
  - **Requirements**:
-	 - Void cells value: not allowed - all grid cells must be filled with data;
 	 - Rows and columns must match the same size of other related raster maps;
 	 - CRS must be projected (coordinates in meters);
 	 - Grid cells must be squared;
+	 - All grid cells must be filled with values;
+	 - Default No-Data cell value: `-1`;
+ - **Data view**:
+
+missing file
 
 ## `map_Var_Date.asc`
- - **Description**: Map of simulated Var={Var} in Date={Date} (ex: map_Inf_2022-02-01);
+ - **Description**: Map of simulated Var in Date (ex: map_Inf_2022-02-01);
  - **Source**: process output;
  - **Format**: Raster Map;
  - **Formating example**:
 ```
 ncols        95
 nrows        77 
-xllcorner    639958.572750000050
-yllcorner    6699796.106709999964
+xllcorner    639958.57
+yllcorner    6699796.10
 cellsize     30.0
-NODATA_value 0
+NODATA_value -1
 5 5 5 5 5 5 5 5 5 5 5 3 3 3 ... 3 3 3 3 3 3 3 3 3 3 3 3 3 4
 5 5 5 5 5 5 5 5 5 5 5 3 3 3 ... 3 3 3 3 3 3 3 3 3 3 3 4 4 4
                             ...  
@@ -483,23 +577,27 @@ NODATA_value 0
 ```
 > See the Raster preparation tutorial
  - **Requirements**:
-	 - Void cells value: not allowed - all grid cells must be filled with data;
 	 - Rows and columns must match the same size of other related raster maps;
 	 - CRS must be projected (coordinates in meters);
 	 - Grid cells must be squared;
+	 - All grid cells must be filled with values;
+	 - Default No-Data cell value: `-1`;
+ - **Data view**:
+
+missing file
 
 ## `map_Var_Stat.asc`
- - **Description**: Map of the statistics Stat={Stat} of simulated Var={Var} (ex: map_Inf_Sum);
+ - **Description**: Map of the statistics Stat of simulated Var (ex: map_Inf_Sum);
  - **Source**: process output;
  - **Format**: Raster Map;
  - **Formating example**:
 ```
 ncols        95
 nrows        77 
-xllcorner    639958.572750000050
-yllcorner    6699796.106709999964
+xllcorner    639958.57
+yllcorner    6699796.10
 cellsize     30.0
-NODATA_value 0
+NODATA_value -1
 5 5 5 5 5 5 5 5 5 5 5 3 3 3 ... 3 3 3 3 3 3 3 3 3 3 3 3 3 4
 5 5 5 5 5 5 5 5 5 5 5 3 3 3 ... 3 3 3 3 3 3 3 3 3 3 3 4 4 4
                             ...  
@@ -509,23 +607,27 @@ NODATA_value 0
 ```
 > See the Raster preparation tutorial
  - **Requirements**:
-	 - Void cells value: not allowed - all grid cells must be filled with data;
 	 - Rows and columns must match the same size of other related raster maps;
 	 - CRS must be projected (coordinates in meters);
 	 - Grid cells must be squared;
+	 - All grid cells must be filled with values;
+	 - Default No-Data cell value: `-1`;
+ - **Data view**:
+
+missing file
 
 ## `map_Var_annual_Stat.asc`
- - **Description**: Map of the statistics Stat={Stat} of simulated Var={Var} in annual scale (ex: map_Inf_Sum_annual);
+ - **Description**: Map of the statistics Stat of simulated Var in annual scale (ex: map_Inf_Sum_annual);
  - **Source**: process output;
  - **Format**: Raster Map;
  - **Formating example**:
 ```
 ncols        95
 nrows        77 
-xllcorner    639958.572750000050
-yllcorner    6699796.106709999964
+xllcorner    639958.57
+yllcorner    6699796.10
 cellsize     30.0
-NODATA_value 0
+NODATA_value -1
 5 5 5 5 5 5 5 5 5 5 5 3 3 3 ... 3 3 3 3 3 3 3 3 3 3 3 3 3 4
 5 5 5 5 5 5 5 5 5 5 5 3 3 3 ... 3 3 3 3 3 3 3 3 3 3 3 4 4 4
                             ...  
@@ -535,10 +637,14 @@ NODATA_value 0
 ```
 > See the Raster preparation tutorial
  - **Requirements**:
-	 - Void cells value: not allowed - all grid cells must be filled with data;
 	 - Rows and columns must match the same size of other related raster maps;
 	 - CRS must be projected (coordinates in meters);
 	 - Grid cells must be squared;
+	 - All grid cells must be filled with values;
+	 - Default No-Data cell value: `-1`;
+ - **Data view**:
+
+missing file
 
 ## `series_sim.txt`
  - **Description**: Time series of simulated hydrologic processes;
@@ -549,7 +655,7 @@ NODATA_value 0
 	 - Field separator: semicolon `;`;
 	 - Decimal separator: period `.`;
 	 - Time resolution: daily timesteps;
-	 - Date format: `YYYY-MM-DD`;
+	 - Date format: `YYYY-MM-DD` (example: `2022-01-29`);
  - **Mandatory Fields**:
 
 |Field Name | Data Type | Description | Units|
@@ -587,6 +693,9 @@ NODATA_value 0
 |` f_cpmax_Alias ` | positive real number | temporal factor for the `cpmax` parameter for LULC types (ex: `f_cpmax_Fs` where `Fs` is the LULC Alias for `Forest`) | unitless|
 |` f_sfmax_Alias ` | positive real number | temporal factor for the `sfmax` parameter for LULC types (ex: `f_sfmax_Fs` where `Fs` is the LULC Alias for `Forest`) | unitless|
 |` f_roots_Alias` | positive real number | temporal factor for the `roots` parameter for LULC types (ex: `f_roots_Fs` where `Fs` is the LULC Alias for `Forest`) | unitless|
+ - **Data view**:
+
+missing file
 
 ## Glossary
 
@@ -617,6 +726,7 @@ NODATA_value 0
 |`Name` | text | Category name | - | field|
 |`P` | positive real number | Precipitation | mm/d | variable|
 |`PET` | positive real number | Potential evapotranspiration | mm/d | variable|
+|`Par` | text | Keyword for `parameter` | - | keyword|
 |`Parameter` | text | Parameter name | - | field|
 |`Q` | positive real number | Streamflow (specific) | mm/d | variable|
 |`Q_obs` | positive real number | Observed specific streamflow | mm/d | variable|
@@ -641,8 +751,8 @@ NODATA_value 0
 |`cpmax` | positive real number | Effective canopy water stock capacity | mm | parameter|
 |`f_cpmax` | positive real number | spatial factor for the `cpmax` parameter | unitless | subparameter|
 |`f_cpmax_Alias` | positive real number | temporal factor for the `cpmax` parameter for LULC types (ex: `f_cpmax_Fs` where `Fs` is the LULC Alias for `Forest`) | unitless | subparameter|
-|`f_ira` | positive real number | temporal factor for  `IRA` input | unitless | subparameter|
-|`f_iri` | positive real number | temporal factor for  `IRI` input | unitless | subparameter|
+|`f_ira` | positive real number | spatial factor for the `IRA` input | unitless | subparameter|
+|`f_iri` | positive real number | spatial factor for the `IRI` input | unitless | subparameter|
 |`f_ksat` | positive real number | spatial factor for the `ksat` parameter | unitless | subparameter|
 |`f_perv` | positive real number | spatial factor of perviousness(1 = 100% pervious) | unitless | subparameter|
 |`f_rho` | positive real number | spatial factor for the `rho` parameter | unitless | subparameter|
@@ -725,6 +835,7 @@ NODATA_value 0
 |`Mean` | text | Keyword for `Mean` | - | keyword|
 |`Med` | text | Keyword for `Median` | - | keyword|
 |`Min` | text | Keyword for `Minimum` | - | keyword|
+|`Par` | text | Keyword for `parameter` | - | keyword|
 |`SD` | text | Keyword for `Standard Deviation` | - | keyword|
 |`Stat` | text | Keyword for `statistic` | - | keyword|
 |`Sum` | text | Keyword for `sum` | - | keyword|
@@ -759,8 +870,8 @@ NODATA_value 0
 |:--- | :--- | :--- | :--- | :---|
 |`f_cpmax` | positive real number | spatial factor for the `cpmax` parameter | unitless | subparameter|
 |`f_cpmax_Alias` | positive real number | temporal factor for the `cpmax` parameter for LULC types (ex: `f_cpmax_Fs` where `Fs` is the LULC Alias for `Forest`) | unitless | subparameter|
-|`f_ira` | positive real number | temporal factor for  `IRA` input | unitless | subparameter|
-|`f_iri` | positive real number | temporal factor for  `IRI` input | unitless | subparameter|
+|`f_ira` | positive real number | spatial factor for the `IRA` input | unitless | subparameter|
+|`f_iri` | positive real number | spatial factor for the `IRI` input | unitless | subparameter|
 |`f_ksat` | positive real number | spatial factor for the `ksat` parameter | unitless | subparameter|
 |`f_perv` | positive real number | spatial factor of perviousness(1 = 100% pervious) | unitless | subparameter|
 |`f_rho` | positive real number | spatial factor for the `rho` parameter | unitless | subparameter|

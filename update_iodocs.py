@@ -27,14 +27,15 @@ def append_basic_series_reqs():
     lst_file.append('\t - Field separator: semicolon `;`;\n')
     lst_file.append('\t - Decimal separator: period `.`;\n')
     lst_file.append('\t - Time resolution: daily timesteps;\n')
-    lst_file.append('\t - Date format: `YYYY-MM-DD`;\n')
+    lst_file.append('\t - Date format: `YYYY-MM-DD` (example: `2022-01-29`);\n')
 
 
 def append_basic_map_reqs():
-    lst_file.append('\t - Void cells value: not allowed - all grid cells must be filled with data;\n')
     lst_file.append('\t - Rows and columns must match the same size of other related raster maps;\n')
     lst_file.append('\t - CRS must be projected (coordinates in meters);\n')
     lst_file.append('\t - Grid cells must be squared;\n')
+    lst_file.append('\t - All grid cells must be filled with values;\n')
+    lst_file.append('\t - Default No-Data cell value: `-1`;\n')
 
 
 def append_fields(lst_fields):
@@ -171,7 +172,7 @@ for i in range(len(lst_dfs)):
                         'xllcorner    639958.57\n' \
                         'yllcorner    6699796.10\n' \
                         'cellsize     30.0\n' \
-                        'NODATA_value 0\n' \
+                        'NODATA_value -1\n' \
                         '5 5 5 5 5 5 5 5 5 5 5 3 3 3 ... 3 3 3 3 3 3 3 3 3 3 3 3 3 4\n' \
                         '5 5 5 5 5 5 5 5 5 5 5 3 3 3 ... 3 3 3 3 3 3 3 3 3 3 3 4 4 4\n' \
                         '                            ...  \n' \
@@ -179,6 +180,7 @@ for i in range(len(lst_dfs)):
                         '5 5 5 5 5 5 5 5 5 5 5 3 3 3 ... 3 3 3 3 3 3 3 3 3 3 3 3 3 3\n'
             lst_file.append('```\n{}\n```\n'.format(s_example))
             lst_file.append('> See the Raster preparation tutorial\n')
+        # reqs
         lst_file.append(' - **Requirements**:\n')
         if s_format == 'Data Table':
             append_basic_table_reqs()
@@ -190,8 +192,19 @@ for i in range(len(lst_dfs)):
             append_fields_head(s_fields=s_opti_fields, s_msg='Optional Fields')
         elif s_format == 'Raster Map':
             append_basic_map_reqs()
+        # special reqs
         if s_special == 'none':
             pass
+        else:
+            lst_file.append(' - **Special requirements**:\n')
+        #
+        lst_file.append(' - **Data view**:\n')
+        s_view_file = './samples/view_{}.png'.format(s_filename)
+        if os.path.isfile(s_view_file):
+            s_ax = '\n![{}]({}/{} "{}")\n'.format(s_filename, s_dir_samples_url, s_view_file, s_filename)
+            lst_file.append(s_ax)
+        else:
+            lst_file.append('\nmissing file\n')
 
 lst_file.append('\n## Glossary\n')
 

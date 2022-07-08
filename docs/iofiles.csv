@@ -1,23 +1,24 @@
 Name;Extension;Source;Format;Description;Dtype;Units;Scale;NoData value;Mandatory Fields;Optional Fields;Special
-param_lulc;txt;imported by user;Data Table;Table of LULC parameters;none;none;none;none;Id & Name & Alias & Color & f_cpmax & f_sfmax & f_roots & f_perv & f_iri & f_ira & usle_C & usle_P & load_N & load_P;none;none
+param_lulc;txt;imported by user;Data Table;Table of LULC parameters ;none;none;none;none;Id & Name & Alias & Color & f_cpmax & f_sfmax & f_roots & f_perv & f_iri & f_ira & usle_C & usle_P & load_N & load_P;none;none
 param_soils;txt;imported by user;Data Table;Table of Soils parameters;none;none;none;none;Id & Name & Alias & Color & f_ksat & f_rho & usle_K;none;none
 param_hydro;txt;imported by user;Data Table;Table of model parameters;none;none;none;none;Parameter & Set & Min & Max;none;none
-map_soils;asc;imported by user;Raster Map;Map of Soils types;`uint8` (unsigned 8-bit integer);Category Id;1;Voids not allowed;none;none;none
-map_lulc;asc;imported by user;Raster Map;Map of LULC (land use and land cover) classes;`uint8` (unsigned 8-bit integer);Category Id;1;Voids not allowed;none;none;none
-map_basin;asc;imported by user;Raster Map;Basin boolean map;`uint8` (unsigned 8-bit integer);Boolean;1;Voids not allowed;none;none;none
-map_twi;asc;imported by user;Raster Map;Map of the Topographical Wetness Index (TWI);`uint16` (unsigned 16-bit integer);unitless;1000;Voids not allowed;none;none;none
-map_hand;asc;imported by user;Raster Map;Map of the Height Above Nearest Drainage (HAND);`uint16` (unsigned 16-bit integer);meters;1000;Voids not allowed;none;none;none
-map_slope;asc;imported by user;Raster Map;Map of terrain slope;`uint16` (unsigned 16-bit integer);degrees;1000;Voids not allowed;none;none;none
-map_ET_obs_Date;asc;imported by user;Raster Map;Map of observed Evapotranspiration in Date={Date};`int16` (16-bit integer);meters;1000;Voids not allowed;none;none;none
+map_soils;asc;imported by user;Raster Map;Map of Soils types;`int8` (8-bit integer);Category Id;1;-1;none;none;none
+map_lulc;asc;imported by user;Raster Map;Map of LULC (land use and land cover) classes;`int8` (8-bit integer);Category Id;1;-1;none;none;none
+map_basin;asc;imported by user;Raster Map;Basin boolean map;`int8` (8-bit integer);Boolean;1;-1;none;none;none
+map_twi;asc;imported by user;Raster Map;Map of the Topographical Wetness Index (TWI);`float32` (32-bit real);unitless;1;-1;none;none;none
+map_hand;asc;imported by user;Raster Map;Map of the Height Above Nearest Drainage (HAND);`float32` (32-bit real);meters;1;-1;none;none;none
+map_slope;asc;imported by user;Raster Map;Map of terrain slope;`float32` (32-bit real);degrees;1;-1;none;none;none
+map_ET_obs_Date;asc;imported by user;Raster Map;Map of observed Evapotranspiration in Date (example: map_ET_obs_2022-01-29);`float32` (32-bit real);meters;1;-1;none;none;none
+map_Par;asc;imported by user;Raster Map;Map of distributed Par factor field (example: map_cpmax);`float32` (32-bit real);unitless;1;-1;none;none;none
 series_obs;txt;imported by user;Time Series;Time series of observed hydrologic processes;none;none;none;none;Date & P & T & IRA & IRI;Q_obs & Flow_obs & ET_obs & f_cpmax_Alias & f_sfmax_Alias & f_roots_Alias;none
 param_shru;txt;process output;Data Table;Table of SHRU parameters;none;none;none;none;Id & Name & Alias & f_cpmax & f_sfmax & f_roots & f_perv & usle_C & usle_P & load_N & load_P &  f_ksat & f_rho & usle_K;none;none
 hist2d_extent;txt;process output;Data Table;2-D histogram (counting matrix) of spatial units within the full map extent;none;none;none;none;none;none;none
 hist2d_basin;txt;process output;Data Table;2-D histogram (counting matrix) of spatial units within the basin extent;none;none;none;none;none;none;none
-zmap_Var_Date;txt;process output;Data Table;ZMap of simulated Var={Var} in Date={Date} (ex: zmap_Inf_2022-02-01);none;none;none;none;none;none;none
-zmap_Var_Stat;txt;process output;Data Table;ZMap of the statistics Stat={Stat} of simulated Var={Var} (ex: zmap_Inf_Sum);none;none;none;none;none;none;none
-zmap_Var_Stat_annual;txt;process output;Data Table;ZMap of the statistics Stat={Stat} of simulated Var={Var} in annual scale (ex: zmap_Inf_Sum_annual);none;none;none;none;none;none;none
+zmap_Var_Date;txt;process output;Data Table;ZMap of simulated Var in Date (ex: zmap_Inf_2022-02-01);none;none;none;none;none;none;none
+zmap_Var_Stat;txt;process output;Data Table;ZMap of the statistics Stat of simulated Var (ex: zmap_Inf_Sum);none;none;none;none;none;none;none
+zmap_Var_Stat_annual;txt;process output;Data Table;ZMap of the statistics Stat of simulated Var in annual scale (ex: zmap_Inf_Sum_annual);none;none;none;none;none;none;none
 map_shru;asc;process output;Raster Map;Map of SHRU (surface hydrologic response units);none;none;none;none;none;none;none
-map_Var_Date;asc;process output;Raster Map;Map of simulated Var={Var} in Date={Date} (ex: map_Inf_2022-02-01);`uint16` (unsigned 16-bit integer);Variable units;1000;Voids not allowed;none;none;none
-map_Var_Stat;asc;process output;Raster Map;Map of the statistics Stat={Stat} of simulated Var={Var} (ex: map_Inf_Sum);`uint16` (unsigned 16-bit integer);Variable units;1000;Voids not allowed;none;none;none
-map_Var_annual_Stat;asc;process output;Raster Map;Map of the statistics Stat={Stat} of simulated Var={Var} in annual scale (ex: map_Inf_Sum_annual);`uint16` (unsigned 16-bit integer);Variable units;1001;Voids not allowed;none;none;none
+map_Var_Date;asc;process output;Raster Map;Map of simulated Var in Date (ex: map_Inf_2022-02-01);`float32` (32-bit real);Variable units;1;-1;none;none;none
+map_Var_Stat;asc;process output;Raster Map;Map of the statistics Stat of simulated Var (ex: map_Inf_Sum);`float32` (32-bit real);Variable units;1;-1;none;none;none
+map_Var_annual_Stat;asc;process output;Raster Map;Map of the statistics Stat of simulated Var in annual scale (ex: map_Inf_Sum_annual);`float32` (32-bit real);Variable units;1;-1;none;none;none
 series_sim;txt;process output;Time Series;Time series of simulated hydrologic processes;none;none;none;none;P & T & IRA & IRI & PET & ET & Cp & Sf & D & Vz & Inf & Intc & Ints & TF & R & RIE & RSE & RC & Qv & Qs & Qb & Q & Flow;Q_obs & Flow_obs & ET_obs & f_cpmax_Alias & f_sfmax_Alias & f_roots_Alias;none
