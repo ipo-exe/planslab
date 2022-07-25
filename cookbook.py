@@ -142,6 +142,7 @@ def demo_plot_scalar_map_batch():
                 b_tui=True,
             )
 
+
 def demo_g2g_model():
     import pandas as pd
     import matplotlib.pyplot as plt
@@ -152,13 +153,17 @@ def demo_g2g_model():
     fseries = './samples/series_obs.txt'
 
     # inform TWI map file
-    ftwi = './samples/map_twi.asc'
+    ftwi = '/home/ipora/Documents/bin/gis/map_twi.asc' #'./samples/map_twi.asc'
 
     # inform HAND map file
-    fhand = './samples/map_hand.asc'
+    fhand = '/home/ipora/Documents/bin/gis/map_hand.asc' #'./samples/map_hand.asc'
 
     # inform basin map file
-    fbasin = './samples/map_basin.asc'
+    fbasin = '/home/ipora/Documents/bin/gis/map_basin.asc' #'./samples/map_basin.asc'
+
+    # inform cpmax map file
+    fcpmax = '/home/ipora/Documents/bin/gis/map_cpmax.asc'  # './samples/map_basin.asc'
+
 
     # load serie to dataframe
     df = pd.read_csv(fseries, sep=';', parse_dates=['Date'])
@@ -172,16 +177,19 @@ def demo_g2g_model():
     meta, hand = inp.asc_raster(file=fhand, dtype='float32')
 
     # load basin map
-    meta, basin = inp.asc_raster(file=fbasin, dtype='float32')
+    meta, basin = inp.asc_raster(file=fbasin, dtype='int16')
+
+    # load cpmax map
+    meta, cpmax0 = inp.asc_raster(file=fcpmax, dtype='float32')
 
     # define parameter values
     hmax = 5
-    w = 0.3
-    cpmax = 20
-    sfmax = 20
-    roots = 20
+    w = 1
+    cpmax = 20 * cpmax0
+    sfmax = 40 * cpmax0
+    roots = 20 * cpmax0
     qo = 10
-    m = 10
+    m = 15
     lamb = 10
     ksat = 20
     rho = 0.2
@@ -220,17 +228,15 @@ def demo_g2g_model():
                      k=k,
                      n=n,
                      lat=lat,
-                     trace=False,  # map traceback
+                     trace=True,  # map traceback
                      tracevars='D-Qv',
-                     integrate=True,  # map integration
-                     integratevars='D-RC-VSA',
+                     integrate=False,  # map integration
+                     integratevars='D-ET-VSA',
                      scale=scale)
 
     # view dataframe
     print(sim['Series'].head(15).to_string())
-    print(sim['Series']['Tp'].sum())
-    print(sim['Integration']['D'].dtype)
-    plt.imshow(sim['Integration']['RC'])
+    plt.imshow(sim['Trace']['Qv'][10] / scale)
     plt.show()
 
     # plot some variables series:
@@ -246,6 +252,6 @@ def demo_g2g_model():
     plt.show()
 
 
-demo_plot_scalar_map_batch()
+#demo_plot_scalar_map_batch()
 
-#demo_g2g_model()
+demo_g2g_model()

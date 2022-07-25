@@ -1,4 +1,4 @@
-'''
+"""
 
 PLANS model routines
 
@@ -41,7 +41,7 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-'''
+"""
 import matplotlib.pyplot as plt
 import numpy as np
 
@@ -66,15 +66,18 @@ def nash_cascade(q, k, n):
     :return: 1d numpy array of routed runoff
     """
     from scipy.special import gamma
+
     size = len(q)
     time = np.arange(0, size)
-    nash = np.power((time / k), (n - 1)) * np.exp(- time / k) / (k * gamma(n))  # the Nash Cascade time function
+    nash = (
+        np.power((time / k), (n - 1)) * np.exp(-time / k) / (k * gamma(n))
+    )  # the Nash Cascade time function
     for t in range(0, len(time)):
         lcl_q = q[t]
         if t == 0:
             qs = lcl_q * nash
         else:
-            qs[t:] = qs[t:] + lcl_q * nash[:size - t]
+            qs[t:] = qs[t:] + lcl_q * nash[: size - t]
     return qs
 
 
@@ -117,7 +120,10 @@ def pet_zenital_angle(day, latitude, hour):
     :return: zenital incidence angle in radians
     """
     dcl = pet_declination(day=day)
-    return np.arccos((np.cos(latitude) * np.cos(dcl) * np.cos(hour)) + (np.sin(latitude) * np.sin(dcl)))
+    return np.arccos(
+        (np.cos(latitude) * np.cos(dcl) * np.cos(hour))
+        + (np.sin(latitude) * np.sin(dcl))
+    )
 
 
 def pet_altitude_angle(day, latitude, hour):
@@ -151,9 +157,17 @@ def pet_daily_hetrad(day, latitude):
     """
     g = pet_g(day)  # Get instant solar radiation in W/m2
     declination = pet_declination(day)  # Get declination in radians
-    hss = pet_hss(declination=declination, latitude=latitude)  # get sun set hour angle in radians
-    het = (24 * 3600 / np.pi) * g * ((np.cos(latitude) * np.cos(declination) * np.sin(hss))
-                                     + (hss * np.sin(latitude) * np.sin(declination)))  # J/(d * m2)
+    hss = pet_hss(
+        declination=declination, latitude=latitude
+    )  # get sun set hour angle in radians
+    het = (
+        (24 * 3600 / np.pi)
+        * g
+        * (
+            (np.cos(latitude) * np.cos(declination) * np.sin(hss))
+            + (hss * np.sin(latitude) * np.sin(declination))
+        )
+    )  # J/(d * m2)
     return het / (1000000)  # MJ/(d * m2)
 
 
@@ -184,7 +198,12 @@ def pet_oudin(temperature, day, latitude, k1=100, k2=5):
     :return: Potential Evapotranspiration in [mm/d]
     """
     het = pet_daily_hetrad(day, latitude)
-    pet = (1000 * het / (pet_latent_heat_flux() * pet_water_spmass() * k1)) * (temperature + k2) * ((temperature + k2) > 0) * 1.0
+    pet = (
+        (1000 * het / (pet_latent_heat_flux() * pet_water_spmass() * k1))
+        * (temperature + k2)
+        * ((temperature + k2) > 0)
+        * 1.0
+    )
     return pet
 
 
@@ -196,7 +215,7 @@ def topmodel_d0(qt0, qo, m):
     :param m: decay parameter in mm
     :return: basin global deficit in mm
     """
-    return - m * np.log(qt0/qo)
+    return -m * np.log(qt0 / qo)
 
 
 def topmodel_qb(d, qo, m):
@@ -207,7 +226,7 @@ def topmodel_qb(d, qo, m):
     :param m: decay parameter in mm
     :return: baseflow in mm/d
     """
-    return qo * np.exp(-d/m)
+    return qo * np.exp(-d / m)
 
 
 def topmodel_qv(d, unz, ksat, threshold=0.001):
@@ -219,7 +238,9 @@ def topmodel_qv(d, unz, ksat, threshold=0.001):
     :param ksat: velocity parameter in mm/d
     :return: vertical recharge rate
     """
-    return ksat * (unz / (d + threshold)) * (d > 0)  # threshold to avoid division by zero
+    return (
+        ksat * (unz / (d + threshold)) * (d > 0)
+    )  # threshold to avoid division by zero
 
 
 def topmodel_di(d, twi, m, lamb):
@@ -233,7 +254,7 @@ def topmodel_di(d, twi, m, lamb):
     """
     lcl_di = d + m * (lamb - twi)
     mask = 1.0 * (lcl_di > 0)
-    lcl_di2 =  np.abs(lcl_di * mask)  # set negative deficit to zero
+    lcl_di2 = np.abs(lcl_di * mask)  # set negative deficit to zero
     return lcl_di2
 
 
@@ -243,16 +264,32 @@ def topmodel_vsai(di):
     :param di: float or nd array of local deficit in mm
     :return: float or nd array of pseudo boolean of saturated areas
     """
-    return ((di == 0) * 1)
+    return (di == 0) * 1
 
 
-def simulation(series_df, basin, htwi, qt0, cpmax, sfmax, roots, qo, m, lamb, ksat, rho, c, n, k,
-               scale=1000,
-               lat=-30,
-               trace=False,
-               tracevars='D-Cp',
-               integrate=False,
-               integratevars='D-Qv'):
+def simulation(
+    series_df,
+    basin,
+    htwi,
+    qt0,
+    cpmax,
+    sfmax,
+    roots,
+    qo,
+    m,
+    lamb,
+    ksat,
+    rho,
+    c,
+    n,
+    k,
+    scale=1000,
+    lat=-30,
+    trace=False,
+    tracevars="D-Cp",
+    integrate=False,
+    integratevars="D-Qv",
+):
     """
 
     g2g simulation model
@@ -315,51 +352,53 @@ def simulation(series_df, basin, htwi, qt0, cpmax, sfmax, roots, qo, m, lamb, ks
 
     # simulation variables
     simvars = [
-               'D',   # saturated water stock deficit
-               'Vz',  # unsaturated zone water stock
-               'Sf',  # surface water stock
-               'Cp',  # canopy water stock
-               'VSA', # variable source area
-               'P',   # precipitation [input]
-               'PET', # potential evapotranspiration
-               'IRI', # irrigation dripping or inundation
-               'IRA', # irrigation by aspersion
-               'Inc', # interceptation in canopy
-               'Ins', # interceptation in surface
-               'TF',  # throughfall
-               'R',   # runoff
-               'RIE', # infiltration excess runoff (Hortonian)
-               'RSE', # saturation excess runoff (Dunnean)
-               'RC',  # runofff coeficient (%)
-               'Inf', # infiltration
-               'Qv',  # recharge
-               'Evc', # evaporation from the canopy
-               'Evs', # evaporation from the surface
-               'Ev',  # evaporation Evc + Evs
-               'Tpv', # transpiration from the vadose zone
-               'Tps', # transpiration from the saturated zone
-               'Tp',  # transpiration Tpu + Tps
-               'ET',  # evapotranspiration (Ev + Tp)
-               'Qb',  # baseflow
-               'Qs',  # stormflow
-               'Q'    # streamflow
-               ]
+        "D",  # saturated water stock deficit
+        "Vz",  # unsaturated zone water stock
+        "Sf",  # surface water stock
+        "Cp",  # canopy water stock
+        "VSA",  # variable source area
+        "P",  # precipitation [input]
+        "PET",  # potential evapotranspiration
+        "IRI",  # irrigation dripping or inundation
+        "IRA",  # irrigation by aspersion
+        "Inc",  # interceptation in canopy
+        "Ins",  # interceptation in surface
+        "TF",  # throughfall
+        "R",  # runoff
+        "RIE",  # infiltration excess runoff (Hortonian)
+        "RSE",  # saturation excess runoff (Dunnean)
+        "RC",  # runofff coeficient (%)
+        "Inf",  # infiltration
+        "Qv",  # recharge
+        "Evc",  # evaporation from the canopy
+        "Evs",  # evaporation from the surface
+        "Ev",  # evaporation Evc + Evs
+        "Tpv",  # transpiration from the vadose zone
+        "Tps",  # transpiration from the saturated zone
+        "Tp",  # transpiration Tpu + Tps
+        "ET",  # evapotranspiration (Ev + Tp)
+        "Qb",  # baseflow
+        "Qs",  # stormflow
+        "Q",  # streamflow
+    ]
     #
     # copy input series
     df_ts = series_df.copy()
 
     # compute PET by Oudin model
-    days = df_ts['Date'].dt.dayofyear
+    days = df_ts["Date"].dt.dayofyear
     ts_days = days.values
     lat = lat * np.pi / 180  # convet lat from degrees to radians
-    df_ts['PET'] = pet_oudin(temperature=df_ts['T'].values, day=ts_days, latitude=lat, k1=c)  # Oudin model
+    df_ts["PET"] = pet_oudin(
+        temperature=df_ts["T"].values, day=ts_days, latitude=lat, k1=c
+    )  # Oudin model
 
     # append global variables fields to simulation series
     for v in simvars:
-        if v in ['P', 'T', 'IRI', 'IRA', 'PET']:
+        if v in ["P", "T", "IRI", "IRA", "PET"]:
             pass
         else:
-            df_ts[v] = 0.0 # set as zero
+            df_ts[v] = 0.0  # set as zero
     #
     #
     # get map shape using basin mask
@@ -372,37 +411,37 @@ def simulation(series_df, basin, htwi, qt0, cpmax, sfmax, roots, qo, m, lamb, ks
     mps = dict()
     mem_size = 0
     for v in simvars:
-        if v == 'Qb' or v == 'Qs' or v == 'Q':
+        if v == "Qb" or v == "Qs" or v == "Q":
             pass
         else:
             # store as uint16 (unsigned 16-bit integer)
-            mps[v] = np.zeros(shape=shape, dtype='uint16')
+            mps[v] = np.zeros(shape=shape, dtype="uint16")
             mem_size = getsizeof(mps[v]) + mem_size
-    print('Sim size : {} MB'.format(mem_size / 1000000))
+    print("Sim size : {} MB".format(mem_size / 1000000))
 
     # deploy trace and integration maps
     mps_trace = dict()
     if trace:
-        tracevars = tracevars.split('-')
+        tracevars = tracevars.split("-")
         mem_size = 0
         for v in tracevars:
             # store as uint16 (unsigned 16-bit integer)
-            mps_trace[v] = np.zeros(shape=(tlen, rows, cols), dtype='uint16')
+            mps_trace[v] = np.zeros(shape=(tlen, rows, cols), dtype="uint16")
             mem_size = getsizeof(mps_trace[v]) + mem_size
-        print('Trace size : {} MB'.format(mem_size / 1000000))
+        print("Trace size : {} MB".format(mem_size / 1000000))
     mps_integrate = dict()
     if integrate:
-        integratevars = integratevars.split('-')
+        integratevars = integratevars.split("-")
         for v in integratevars:
             # store as uint16 (unsigned 16-bit integer)
-            mps_integrate[v] = np.zeros(shape=(rows, cols), dtype='uint16')
+            mps_integrate[v] = np.zeros(shape=(rows, cols), dtype="uint16")
     #
     # get initial local deficits
-    df_ts['D'].values[0] = topmodel_d0(qt0=qt0, qo=qo, m=m)
+    df_ts["D"].values[0] = topmodel_d0(qt0=qt0, qo=qo, m=m)
 
     # todo adapt to twi vector
-    mps['D'] = scale * topmodel_di(d=df_ts['D'].values[0], twi=htwi, m=m, lamb=lamb)
-    mps['VSA'] = topmodel_vsai(di=mps['D'])
+    mps["D"] = scale * topmodel_di(d=df_ts["D"].values[0], twi=htwi, m=m, lamb=lamb)
+    mps["VSA"] = topmodel_vsai(di=mps["D"])
 
     # get root zone depth:
     rzd = roots * rho
@@ -410,115 +449,160 @@ def simulation(series_df, basin, htwi, qt0, cpmax, sfmax, roots, qo, m, lamb, ks
     # ESMA loop
     for t in range(tlen):
         # INPUT define P and PET
-        mps['P'] = df_ts['P'].values[t] * scale * np.ones(shape=shape, dtype='uint32')
-        mps['PET'] = df_ts['PET'].values[t] * scale * np.ones(shape=shape, dtype='uint32')
+        mps["P"] = df_ts["P"].values[t] * scale * np.ones(shape=shape, dtype="uint32")
+        mps["PET"] = (
+            df_ts["PET"].values[t] * scale * np.ones(shape=shape, dtype="uint32")
+        )
 
         # STOCKS WATER BALANCE (backward looking)
         if t > 0:
             # Canopy water balance
-            mps['Cp'] = mps['Cp'] + mps['Inc'] - mps['Evc']
-            df_ts['Cp'].values[t] = avg_2d(var2d=mps['Cp'], weight=basin) / scale  # compute basin-wide avg
+            mps["Cp"] = mps["Cp"] + mps["Inc"] - mps["Evc"]
+            df_ts["Cp"].values[t] = (
+                avg_2d(var2d=mps["Cp"], weight=basin) / scale
+            )  # compute basin-wide avg
             #
             # Vadose zone water balance
-            mps['Vz'] = mps['Vz'] + mps['Inf'] - mps['Qv'] - mps['Tpv']
-            df_ts['Vz'].values[t] = avg_2d(var2d=mps['Vz'], weight=basin) / scale  # compute basin-wide avg
+            mps["Vz"] = mps["Vz"] + mps["Inf"] - mps["Qv"] - mps["Tpv"]
+            df_ts["Vz"].values[t] = (
+                avg_2d(var2d=mps["Vz"], weight=basin) / scale
+            )  # compute basin-wide avg
             #
             # Surface water balance
-            mps['Sf'] = mps['Sf'] + mps['Ins'] - mps['Inf'] - mps['Evs']
-            df_ts['Sf'].values[t] = avg_2d(var2d=mps['Sf'], weight=basin) / scale  # compute basin-wide avg
+            mps["Sf"] = mps["Sf"] + mps["Ins"] - mps["Inf"] - mps["Evs"]
+            df_ts["Sf"].values[t] = (
+                avg_2d(var2d=mps["Sf"], weight=basin) / scale
+            )  # compute basin-wide avg
             #
             # Deficit water balance
-            df_ts['D'].values[t] = df_ts['D'].values[t - 1] + df_ts['Qb'].values[t - 1] + df_ts['Tps'].values[t - 1] - \
-                                df_ts['Qv'].values[t - 1]
+            df_ts["D"].values[t] = (
+                df_ts["D"].values[t - 1]
+                + df_ts["Qb"].values[t - 1]
+                + df_ts["Tps"].values[t - 1]
+                - df_ts["Qv"].values[t - 1]
+            )
             # update Deficit
             # todo adapt to twi vector
-            mps['D'] = scale * topmodel_di(d=df_ts['D'].values[t], twi=htwi, m=m, lamb=lamb)
+            mps["D"] = scale * topmodel_di(
+                d=df_ts["D"].values[t], twi=htwi, m=m, lamb=lamb
+            )
             # update VSA
-            mps['VSA'] = topmodel_vsai(di=mps['D'])
-            df_ts['VSA'].values[t] = 100 * avg_2d(var2d=mps['VSA'], weight=basin) / scale  # compute basin-wide avg
+            mps["VSA"] = topmodel_vsai(di=mps["D"])
+            df_ts["VSA"].values[t] = (
+                100 * avg_2d(var2d=mps["VSA"], weight=basin) / scale
+            )  # compute basin-wide avg
 
         # FLOWS COMPUTATION
 
         # --- Canopy flows
 
         # potential interceptation on canopy
-        p_intc = (scale * cpmax) - mps['Cp']
+        p_intc = (scale * cpmax) - mps["Cp"]
         #
         # Interceptation in the canopy
-        mps['Inc'] = (p_intc * (mps['P'] > p_intc)) + (mps['P'] * (mps['P'] <= p_intc))
-        df_ts['Inc'].values[t] = avg_2d(var2d=mps['Inc'], weight=basin) / scale  # compute basin-wide avg
+        mps["Inc"] = (p_intc * (mps["P"] > p_intc)) + (mps["P"] * (mps["P"] <= p_intc))
+        df_ts["Inc"].values[t] = (
+            avg_2d(var2d=mps["Inc"], weight=basin) / scale
+        )  # compute basin-wide avg
         #
         # Evaporation in the canopy
-        mps['Evc'] = (mps['PET'] * (mps['Cp'] > mps['PET'])) + (mps['Cp'] * (mps['Cp'] <= mps['PET']))
-        df_ts['Evc'].values[t] = avg_2d(var2d=mps['Evc'], weight=basin) / scale  # compute basin-wide avg
+        mps["Evc"] = (mps["PET"] * (mps["Cp"] > mps["PET"])) + (
+            mps["Cp"] * (mps["Cp"] <= mps["PET"])
+        )
+        df_ts["Evc"].values[t] = (
+            avg_2d(var2d=mps["Evc"], weight=basin) / scale
+        )  # compute basin-wide avg
         #
         # update PET
-        mps['PET'] = mps['PET'] - np.mean(mps['Evc'])
+        mps["PET"] = mps["PET"] - np.mean(mps["Evc"])
         #
         # Throughfall
-        mps['TF'] = mps['P'] - mps['Inc']
-        df_ts['TF'].values[t] = avg_2d(var2d=mps['TF'], weight=basin) / scale  # compute basin-wide avg
-
+        mps["TF"] = mps["P"] - mps["Inc"]
+        df_ts["TF"].values[t] = (
+            avg_2d(var2d=mps["TF"], weight=basin) / scale
+        )  # compute basin-wide avg
 
         # --- Transpiration from groundwater
 
         # potential tp from gw:
-        p_tpgw = (rzd * scale) - mps['D']
-        p_tpgw = p_tpgw * (p_tpgw >= 0) # remove negative values
+        p_tpgw = (rzd * scale) - mps["D"]
+        p_tpgw = p_tpgw * (p_tpgw >= 0)  # remove negative values
         #
         # Transpiration from groundwater
-        mps['Tps'] = (mps['PET'] * (p_tpgw > mps['PET'])) + (p_tpgw * (p_tpgw <= mps['PET']))
-        df_ts['Tps'].values[t] = avg_2d(var2d=mps['Tps'], weight=basin) / scale  # compute basin-wide avg
+        mps["Tps"] = (mps["PET"] * (p_tpgw > mps["PET"])) + (
+            p_tpgw * (p_tpgw <= mps["PET"])
+        )
+        df_ts["Tps"].values[t] = (
+            avg_2d(var2d=mps["Tps"], weight=basin) / scale
+        )  # compute basin-wide avg
 
         #
         # update PET
-        mps['PET'] = mps['PET'] - np.mean(mps['Tps'])
+        mps["PET"] = mps["PET"] - np.mean(mps["Tps"])
 
         # ---- Interceptation on the surface
 
         # potential Infs
-        p_ints = (sfmax * scale) - mps['Sf']
+        p_ints = (sfmax * scale) - mps["Sf"]
         #
         # Interceptation on the surface
-        mps['Ins'] = (p_ints * (mps['TF'] > p_ints)) + (mps['TF'] * (mps['TF'] <= p_ints))
-        df_ts['Ins'].values[t] = avg_2d(var2d=mps['Ins'], weight=basin) / scale  # compute basin-wide avg
+        mps["Ins"] = (p_ints * (mps["TF"] > p_ints)) + (
+            mps["TF"] * (mps["TF"] <= p_ints)
+        )
+        df_ts["Ins"].values[t] = (
+            avg_2d(var2d=mps["Ins"], weight=basin) / scale
+        )  # compute basin-wide avg
 
         # ---- Runoff
 
         # Runoff
-        mps['R'] = mps['TF'] - mps['Ins']
-        df_ts['R'].values[t] = avg_2d(var2d=mps['R'], weight=basin) / scale  # compute basin-wide avg
+        mps["R"] = mps["TF"] - mps["Ins"]
+        df_ts["R"].values[t] = (
+            avg_2d(var2d=mps["R"], weight=basin) / scale
+        )  # compute basin-wide avg
         #
         # Runoff component -  RIE
-        mps['RIE'] = mps['R'] * (mps['VSA'] != 1)
-        df_ts['RIE'].values[t] = avg_2d(var2d=mps['RIE'], weight=basin) / scale  # compute basin-wide avg
+        mps["RIE"] = mps["R"] * (mps["VSA"] != 1)
+        df_ts["RIE"].values[t] = (
+            avg_2d(var2d=mps["RIE"], weight=basin) / scale
+        )  # compute basin-wide avg
         #
         # Runoff components -  RSE
-        mps['RSE'] = mps['R'] * (mps['VSA'] == 1)
-        df_ts['RSE'].values[t] = avg_2d(var2d=mps['RSE'], weight=basin) / scale  # compute basin-wide avg
+        mps["RSE"] = mps["R"] * (mps["VSA"] == 1)
+        df_ts["RSE"].values[t] = (
+            avg_2d(var2d=mps["RSE"], weight=basin) / scale
+        )  # compute basin-wide avg
         #
         # Runoff components -  RC
-        if df_ts['P'].values[t] > 0:  # avoid division by zero
-            mps['RC'] = 100 * mps['R'] / mps['P']
+        if df_ts["P"].values[t] > 0:  # avoid division by zero
+            mps["RC"] = 100 * mps["R"] / mps["P"]
         else:
-            mps['RC'] = mps['RC'] * 0
-        df_ts['RC'].values[t] = avg_2d(var2d=mps['RC'], weight=basin) # compute basin-wide avg
+            mps["RC"] = mps["RC"] * 0
+        df_ts["RC"].values[t] = avg_2d(
+            var2d=mps["RC"], weight=basin
+        )  # compute basin-wide avg
 
         # ---- Infiltration
         # potential infiltration allowed by surface water
-        p_infs = ((ksat * scale) * (mps['Sf'] > (ksat * scale))) + (mps['Sf'] * (mps['Sf'] <= (ksat * scale)))
+        p_infs = ((ksat * scale) * (mps["Sf"] > (ksat * scale))) + (
+            mps["Sf"] * (mps["Sf"] <= (ksat * scale))
+        )
         #
         # potential infiltration allowed by the vadose zone
-        p_infu = (mps['D'] - mps['Vz']) * ((mps['D'] - mps['Vz']) > 0)  # ensure positive values only - Deficit update
+        p_infu = (mps["D"] - mps["Vz"]) * (
+            (mps["D"] - mps["Vz"]) > 0
+        )  # ensure positive values only - Deficit update
         #
         # Infiltration
-        mps['Inf'] = (p_infu * (p_infs > p_infu)) + (p_infs * (p_infs <= p_infu))
-        df_ts['Inf'].values[t] = avg_2d(var2d=mps['Inf'], weight=basin) / scale  # compute basin-wide avg
+        mps["Inf"] = (p_infu * (p_infs > p_infu)) + (p_infs * (p_infs <= p_infu))
+        df_ts["Inf"].values[t] = (
+            avg_2d(var2d=mps["Inf"], weight=basin) / scale
+        )  # compute basin-wide avg
 
         # ---- Recharge
 
         # Vadose zone saturation
-        unz_sat = mps['Vz'] / (mps['D'] + (scale / 1000))
+        unz_sat = mps["Vz"] / (mps["D"] + (scale / 1000))
         unz_sat = np.nan_to_num(unz_sat, nan=0)
         unz_sat = (unz_sat * (unz_sat <= 1)) + (1 * (unz_sat > 1))
         #
@@ -526,42 +610,58 @@ def simulation(series_df, basin, htwi, qt0, cpmax, sfmax, roots, qo, m, lamb, ks
         p_qv = (ksat * scale) * unz_sat
         #
         # Recharge
-        mps['Qv'] = (p_qv * (mps['Vz'] > p_qv)) + (mps['Vz'] * (mps['Vz'] <= p_qv))
-        df_ts['Qv'].values[t] = avg_2d(var2d=mps['Qv'], weight=basin) / scale  # compute basin-wide avg
+        mps["Qv"] = (p_qv * (mps["Vz"] > p_qv)) + (mps["Vz"] * (mps["Vz"] <= p_qv))
+        df_ts["Qv"].values[t] = (
+            avg_2d(var2d=mps["Qv"], weight=basin) / scale
+        )  # compute basin-wide avg
 
         # ---- Transpiration from vadose zone
         #
         # transpiration factor for accounting root depth in the vadoze zone
-        tp_factor = ((rzd * scale) / (mps['D'] + (scale / 1000)))
-        tp_factor = np.nan_to_num(tp_factor, nan=1, posinf=1) # avoid nan values where D is 0
+        tp_factor = (rzd * scale) / (mps["D"] + (scale / 1000))
+        tp_factor = np.nan_to_num(
+            tp_factor, nan=1, posinf=1
+        )  # avoid nan values where D is 0
         tp_factor = (tp_factor * (tp_factor < 1)) + (1 * (tp_factor >= 1))
         #
         # potential tp
-        p_tpun_1 = (mps['Vz'] - mps['Qv'])
-        p_tpun = (p_tpun_1 * ((rzd * scale) > mps['D'])) + (p_tpun_1 * tp_factor * ((rzd * scale) <= mps['D']))
+        p_tpun_1 = mps["Vz"] - mps["Qv"]
+        p_tpun = (p_tpun_1 * ((rzd * scale) > mps["D"])) + (
+            p_tpun_1 * tp_factor * ((rzd * scale) <= mps["D"])
+        )
         #
         # Transpiration from vadose zone
-        mps['Tpv'] = (mps['PET'] * (p_tpun > mps['PET'])) + (p_tpun * (p_tpun <= mps['PET']))
-        df_ts['Tpv'].values[t] = avg_2d(var2d=mps['Tpv'], weight=basin) / scale  # compute basin-wide avg
+        mps["Tpv"] = (mps["PET"] * (p_tpun > mps["PET"])) + (
+            p_tpun * (p_tpun <= mps["PET"])
+        )
+        df_ts["Tpv"].values[t] = (
+            avg_2d(var2d=mps["Tpv"], weight=basin) / scale
+        )  # compute basin-wide avg
         #
         # update PET
-        mps['PET'] = mps['PET'] - np.mean(mps['Tpv'])
+        mps["PET"] = mps["PET"] - np.mean(mps["Tpv"])
 
         # Evaporation from the surface
         # potential Evs
-        p_evs = mps['Sf'] - mps['Inf']
+        p_evs = mps["Sf"] - mps["Inf"]
         # Evs
-        mps['Evs'] = (mps['PET'] * (p_evs > mps['PET'])) + (p_evs * (p_evs <= mps['PET']))
-        df_ts['Evs'].values[t] = avg_2d(var2d=mps['Evs'], weight=basin) / scale  # compute basin-wide avg
+        mps["Evs"] = (mps["PET"] * (p_evs > mps["PET"])) + (
+            p_evs * (p_evs <= mps["PET"])
+        )
+        df_ts["Evs"].values[t] = (
+            avg_2d(var2d=mps["Evs"], weight=basin) / scale
+        )  # compute basin-wide avg
 
         # --- Baseflow
-        df_ts['Qb'].values[t] = topmodel_qb(d=df_ts['D'].values[t], qo=qo, m=m)
+        df_ts["Qb"].values[t] = topmodel_qb(d=df_ts["D"].values[t], qo=qo, m=m)
 
         # --- ET
-        mps['Tp'] = mps['Tps'] + mps['Tpv']  # Tp
-        mps['Ev'] = mps['Evc'] + mps['Evs']  # Ev
-        mps['ET'] = mps['Evc'] + mps['Evs'] + mps['Tps'] + mps['Tpv']
-        df_ts['ET'].values[t] = avg_2d(var2d=mps['ET'], weight=basin) / scale  # compute basin-wide avg
+        mps["Tp"] = mps["Tps"] + mps["Tpv"]  # Tp
+        mps["Ev"] = mps["Evc"] + mps["Evs"]  # Ev
+        mps["ET"] = mps["Evc"] + mps["Evs"] + mps["Tps"] + mps["Tpv"]
+        df_ts["ET"].values[t] = (
+            avg_2d(var2d=mps["ET"], weight=basin) / scale
+        )  # compute basin-wide avg
         #
         # append to trace and integration
         if trace:
@@ -575,20 +675,20 @@ def simulation(series_df, basin, htwi, qt0, cpmax, sfmax, roots, qo, m, lamb, ks
     # RUNOFF ROUTING by Nash Cascade of linear reservoirs
     if n < 1:
         n = 1.0
-    df_ts['Qs'] = nash_cascade(df_ts['R'].values, k=k, n=n)
+    df_ts["Qs"] = nash_cascade(df_ts["R"].values, k=k, n=n)
     #
     #
     # Compute full discharge Q = Qb + Qs
-    df_ts['Q'] = df_ts['Qb'] + df_ts['Qs']
+    df_ts["Q"] = df_ts["Qb"] + df_ts["Qs"]
 
     # compute global Tp and Ev
-    df_ts['Tp'] = df_ts['Tpv'] + df_ts['Tps']
-    df_ts['Ev'] = df_ts['Evc'] + df_ts['Evs']
+    df_ts["Tp"] = df_ts["Tpv"] + df_ts["Tps"]
+    df_ts["Ev"] = df_ts["Evc"] + df_ts["Evs"]
 
     # average stocks in integration:
     if integrate:
         for v in integratevars:
-            if v in ['D', 'Cp', 'Sf', 'Vz', 'VSA', 'RC']:
+            if v in ["D", "Cp", "Sf", "Vz", "VSA", "RC"]:
                 mps_integrate[v] = mps_integrate[v] / tlen
     # return
-    return {'Series': df_ts, 'Trace': mps_trace, 'Integration': mps_integrate}
+    return {"Series": df_ts, "Trace": mps_trace, "Integration": mps_integrate}

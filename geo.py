@@ -1,4 +1,4 @@
-'''
+"""
 
 PLANS geoprocessing routines
 
@@ -41,7 +41,7 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-'''
+"""
 import numpy as np
 
 
@@ -60,7 +60,7 @@ def areas(array, cellsize, values, factor=1):
         lcl_pixsum = np.sum(lcl_bool)
         lcl_area = lcl_pixsum * cellsize * cellsize
         areas.append(lcl_area)
-    return np.array(areas)/(factor * factor)
+    return np.array(areas) / (factor * factor)
 
 
 def xmap(map1, map2, map1ids, map2ids, map1f=100, map2f=1):
@@ -85,7 +85,7 @@ def xmap(map1, map2, map1ids, map2ids, map1f=100, map2f=1):
     return xmap
 
 
-def fuzzy_transition(array, a, b, ascending=True, type='senoid'):
+def fuzzy_transition(array, a, b, ascending=True, type="senoid"):
     """
 
     Fuzzify a numpy array by a transition from a to b values
@@ -98,15 +98,23 @@ def fuzzy_transition(array, a, b, ascending=True, type='senoid'):
     :return: numpy array
     """
     if ascending:
-        if type == 'senoid':
-            transition = (array >= b) + (array > a) * (array < b) * (-0.5 * np.cos(np.pi * (array - a)/(b - a)) + 0.5 )
-        if type == 'linear':
-            transition = (array >= b) + (array > a) * (array < b) * (( array / (b - a)) - (a / (b - a)))
+        if type == "senoid":
+            transition = (array >= b) + (array > a) * (array < b) * (
+                -0.5 * np.cos(np.pi * (array - a) / (b - a)) + 0.5
+            )
+        if type == "linear":
+            transition = (array >= b) + (array > a) * (array < b) * (
+                (array / (b - a)) - (a / (b - a))
+            )
     else:
-        if type == 'senoid':
-            transition = (array <= a) + (array > a) * (array < b) * (0.5 * np.cos(np.pi * (array - a)/(b - a)) + 0.5)
-        if type == 'linear':
-            transition = (array <= a) + (array > a) * (array < b) * ((- array / (b - a)) + (b / (b - a)))
+        if type == "senoid":
+            transition = (array <= a) + (array > a) * (array < b) * (
+                0.5 * np.cos(np.pi * (array - a) / (b - a)) + 0.5
+            )
+        if type == "linear":
+            transition = (array <= a) + (array > a) * (array < b) * (
+                (-array / (b - a)) + (b / (b - a))
+            )
     return transition
 
 
@@ -136,7 +144,9 @@ def htwi(twi, hand, h_max=15.0, hand_lo=0.0, h_w=1, twi_w=1):
     twi_comp = h_w * hand_fuzz + twi_w * twi_fuzz
     #
     # fuzify again to restore twi range
-    twi_hand_map = twi_hi * fuzzy_transition(twi_comp, a=np.min(twi_comp), b=np.max(twi_comp))
+    twi_hand_map = twi_hi * fuzzy_transition(
+        twi_comp, a=np.min(twi_comp), b=np.max(twi_comp)
+    )
     return twi_hand_map
 
 
@@ -155,7 +165,9 @@ def reclassify(array, upvalues, classes):
         if i == 0:
             new = new + ((array <= upvalues[i]) * classes[i])
         else:
-            new = new + ((array > upvalues[i - 1]) * (array <= upvalues[i]) * classes[i])
+            new = new + (
+                (array > upvalues[i - 1]) * (array <= upvalues[i]) * classes[i]
+            )
     return new
 
 
@@ -195,7 +207,9 @@ def rusle_s(slope):
     """
     slope_rad = np.pi * 2 * slope / 360
     lcl_grad = np.sin(slope_rad)
-    lcl_s = ((10.8 * lcl_grad + 0.03 ) * (lcl_grad < 0.09)) + ((16.8 * lcl_grad - 0.5 ) * (lcl_grad >= 0.09))
+    lcl_s = ((10.8 * lcl_grad + 0.03) * (lcl_grad < 0.09)) + (
+        (16.8 * lcl_grad - 0.5) * (lcl_grad >= 0.09)
+    )
     return lcl_s
 
 
@@ -220,7 +234,11 @@ def usle_l(slope, cellsize):
     """
     slope_rad = np.pi * 2 * slope / 360
     lcl_grad = np.sin(slope_rad)
-    m = reclassify(lcl_grad, upvalues=(0.01, 0.03, 0.05, np.max(lcl_grad)), classes=(0.2, 0.3, 0.4, 0.5))
+    m = reclassify(
+        lcl_grad,
+        upvalues=(0.01, 0.03, 0.05, np.max(lcl_grad)),
+        classes=(0.2, 0.3, 0.4, 0.5),
+    )
     return np.power(np.sqrt(2) * cellsize / 22.13, m)
 
 
